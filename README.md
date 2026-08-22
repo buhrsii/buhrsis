@@ -1,15 +1,12 @@
-Buhrsi's v0.14.5 TESTBUILD – 45 Sekunden
-TEMPORÄRER TESTBUILD.
-- Putzrunde auf 45 Sekunden verkürzt.
-- Vier Putzbereiche werden gleichmäßig über 45 Sekunden verteilt.
-- Bereichswechsel behalten ihren Ton.
-- Letzte 10 Sekunden: Ton bei jeder Sekunde.
-- Bei 0: längerer Abschlusston.
-- Start: Bestätigungston.
-- Hatch-Fix aus v0.14.4 bleibt enthalten.
-
-WICHTIG:
-Vor dem finalen Release wird die Putzzeit wieder auf 120 Sekunden gestellt.
+Buhrsi's v0.14.6 TESTBUILD – 45 Sekunden (korrigiert)
+- Fehler aus v0.14.5 behoben: Die statische Startanzeige war noch auf 02:00.
+- Startseite zeigt jetzt 00:45.
+- Putzmodus startet bei 00:45.
+- Tatsächliche Endzeit bleibt 45 Sekunden.
+- Vier Bereiche werden über 45 Sekunden verteilt.
+- Startton, Bereichstöne, Countdown 10–1 und längerer Endton bleiben enthalten.
+- Serverseitige Belohnungsdauer bleibt absichtlich als qualifizierte Test-Putzrunde behandelt, damit die Testdaten funktionieren.
 
 Keine Supabase-Änderung.
-Alle Dateien ins bestehende GitHub-Repo hochladen und main committen.
+GitHub-Dateien komplett ersetzen und main committen.
+Danach iPhone-App vollständig schließen und neu öffnen.
