@@ -1,12 +1,15 @@
-Buhrsi's v0.14 – Entwicklung & lebendiger Sammlerwert
-- Seltenheit eines Buhrsi bleibt dauerhaft unverändert.
-- Jedes Buhrsi erhält einen Care Score (0–100).
-- Regelmäßiges Putzen verbessert Care Score, Bindung, Glanz und Wert.
-- Ausbleibende tägliche Pflege kann den aktuellen Wert reduzieren.
-- Basiswert bleibt als ursprünglicher Wert erhalten.
-- Entwicklungsstufen: Stufe 1, ab 150 XP Stufe 2, ab 500 XP Stufe 3.
-- Eine abgeschlossene Putzrunde gibt vorhandenen Buhrsi’s +10 XP, +1 Bindung und +1 Glanz.
-- Timer aus v0.13.1 bleibt unverändert.
+Buhrsi's v0.14.1 – Stabilität
+- Freeze nach abgeschlossener Putzrunde behoben.
+- Abschluss-Event wird erst ausgelöst, nachdem der Reward-Screen vollständig aufgebaut wurde.
+- Weiter-Button räumt Brush-/Reward-Overlays und Body-Lock defensiv auf.
+- Unsichtbare Overlays können keine Touch-Eingaben mehr blockieren.
+- Funktionierender Endzeit-Timer aus v0.13.x bleibt unverändert.
+- Keine neuen Gameplay-Funktionen.
+- Kein neuer Supabase-Schritt.
 
-Einmalig `supabase-v014.sql` im Supabase SQL Editor ausführen.
-Danach alle Dateien ins bestehende GitHub-Repo hochladen und auf main committen.
+WICHTIG ZUM IPHONE-DISPLAY:
+Die PWA-Wake-Lock-Versuche bleiben vorerst nur als Best-Effort erhalten. iOS kann sie bei installierten Web-Apps weiterhin ignorieren.
+Die zuverlässige Lösung wird die native iOS-Hülle. Dafür wird im nächsten Schritt ein eigenes App-Projekt vorbereitet; dieser Stabilitätsbuild verändert den Timer nicht.
+
+Installation:
+Alle Dateien in das bestehende GitHub-Repo hochladen und auf main committen. Keine SQL-Datei ausführen.

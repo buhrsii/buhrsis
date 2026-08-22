@@ -91,18 +91,28 @@ function updateZone(force=false){
 function finish(){
  if(finishing)return;finishing=true;
  clearInterval(timer);timer=null;brushEndAt=0;sessionStorage.removeItem("buhrsiBrushEndAt");
- brushTone(true);brushVibrate(true);window.dispatchEvent(new Event("buhrsi:brush-complete"));
+ brushTone(true);brushVibrate(true);
  $('#brushScreen').classList.remove('open','finale');
  const oldLevel=Math.floor(state.xp/200)+1;state.xp+=20;state.glanz=Math.min(100,state.glanz+3);state.eggEnergy=Math.min(200,(state.eggEnergy||0)+20);
  const today=new Date().toISOString().slice(0,10);if(state.lastBrush!==today){state.streak+=1;state.lastBrush=today}
  const newLevel=Math.floor(state.xp/200)+1;save();render();
  $('#rewardLevel').textContent=newLevel>oldLevel?'LEVEL '+newLevel+'!':'GESCHAFFT!';$('#rewardXp').textContent='+20 XP';$('#rewardGlanz').textContent='+3 Glanz';$('#rewardStreak').textContent='🔥 '+state.streak+' Tage';
  $('#reward').classList.add('open');confetti();
+ // Notify cloud/game systems only after the completion UI is fully established.
+ setTimeout(()=>window.dispatchEvent(new Event("buhrsi:brush-complete")),0);
 }
 function confetti(){const box=$('#sparkles');box.innerHTML='';for(let i=0;i<24;i++){const s=document.createElement('i');s.style.left=(45+Math.random()*10)+'%';s.style.top='48%';s.style.setProperty('--x',(Math.random()*360-180)+'px');s.style.setProperty('--y',(-80-Math.random()*280)+'px');s.style.animationDelay=(Math.random()*.25)+'s';box.append(s)}}
-function closeReward(){$('#reward').classList.remove('open');document.body.classList.remove('locked');toast('✨ Fortschritt gespeichert')}
+function closeReward(){
+ const reward=$('#reward'),brush=$('#brushScreen');
+ if(reward)reward.classList.remove('open');
+ if(brush)brush.classList.remove('open','finale');
+ document.body.classList.remove('locked');
+ document.documentElement.classList.remove('tips-open');
+ finishing=false;
+ toast('✨ Fortschritt gespeichert');
+}
 function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2200)}
-$('#start').onclick=openBrush;$('#tips').onclick=()=>toast('30 Sek. pro Bereich • sanft kreisen • alle Flächen');$('#rewardDone').onclick=closeReward;
+$('#start').onclick=openBrush;$('#rewardDone').onclick=closeReward;
 render();
 
 // v0.5 cloud/egg adapter
@@ -352,3 +362,12 @@ document.addEventListener("DOMContentLoaded",prepareBrushAudio);
  });
  setTimeout(async()=>{await window.BuhrsiEvolution?.refresh?.();window.refreshCollection?.()},1800);
 })();
+
+// v0.14.1 stability guard: reward overlay must never trap the UI.
+document.addEventListener("click",e=>{
+ const b=e.target.closest("#rewardDone,.reward-close,.reward-continue,[data-action='continue']");
+ if(!b)return;
+ const reward=document.getElementById("reward"),brush=document.getElementById("brushScreen");
+ reward?.classList.remove("open");brush?.classList.remove("open","finale");
+ document.body.classList.remove("locked");
+},true);
