@@ -42,3 +42,36 @@ function closeReward(){$('#reward').classList.remove('open');document.body.class
 function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2200)}
 $('#start').onclick=openBrush;$('#tips').onclick=()=>toast('30 Sek. pro Bereich • sanft kreisen • alle Flächen');$('#rewardDone').onclick=closeReward;
 render();
+
+// v0.5 cloud/egg adapter
+(function(){
+  const EGG_MAX=100;
+  function readLocal(){
+    let s={};
+    try{s=JSON.parse(localStorage.getItem("buhrsiState")||localStorage.getItem("buhrsis-state")||"{}")}catch(e){}
+    return {
+      xp:Number(s.xp)||0, gloss:Number(s.gloss ?? s.shine)||50,
+      streak:Number(s.streak)||0, eggEnergy:Number(s.eggEnergy ?? s.egg_energy)||0
+    };
+  }
+  function eggStage(e){ if(e>=100)return 4;if(e>=75)return 3;if(e>=45)return 2;if(e>=20)return 1;return 0; }
+  function renderEgg(){
+    const p=readLocal(), el=document.getElementById("eggV05");
+    if(!el)return;
+    const st=eggStage(p.eggEnergy);
+    el.dataset.stage=String(st);
+    el.querySelector(".egg-v05-fill").style.width=Math.min(100,p.eggEnergy)+"%";
+    el.querySelector(".egg-v05-label").textContent=p.eggEnergy>=100?"Bereit zum Schlüpfen":p.eggEnergy+" / "+EGG_MAX+" Energie";
+  }
+  async function sync(){
+    const c=window.BuhrsiCloud;
+    if(c?.saveProgress) await c.saveProgress(readLocal());
+    renderEgg();
+  }
+  window.addEventListener("buhrsi:brush-complete",async()=>{ await sync(); await window.BuhrsiCloud?.logBrush?.(120,20,3); });
+  document.addEventListener("click",e=>{
+    if(e.target.closest(".reward-close,.reward-continue,[data-action='continue']")) setTimeout(sync,100);
+  });
+  setInterval(renderEgg,1500);
+  setTimeout(renderEgg,500);
+})();

@@ -31,3 +31,27 @@ $("#childForm").addEventListener("submit",async e=>{
 $("#logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();user=child=null;await gate()});
 try{let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=m.createClient(SUPABASE_URL,SUPABASE_KEY);await gate()}
 catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
+
+window.BuhrsiCloud = {
+  get child(){ return child; },
+  async saveProgress(progress){
+    if(!sb || !user || !child) return {ok:false};
+    const payload={
+      xp: Math.max(0, Number(progress.xp)||0),
+      gloss: Math.max(0, Math.min(100, Number(progress.gloss)||0)),
+      streak: Math.max(0, Number(progress.streak)||0),
+      egg_energy: Math.max(0, Number(progress.eggEnergy)||0)
+    };
+    const {data,error}=await sb.from("child_profiles").update(payload).eq("id",child.id).select().single();
+    if(error){ console.error(error); return {ok:false,error}; }
+    child=data; return {ok:true,data};
+  },
+  async logBrush(duration=120,xpEarned=20,glossEarned=3){
+    if(!sb || !user || !child) return;
+    const {error}=await sb.from("brushing_sessions").insert({
+      child_id:child.id,parent_id:user.id,duration_seconds:duration,
+      xp_earned:xpEarned,gloss_earned:glossEarned
+    });
+    if(error) console.error(error);
+  }
+};
