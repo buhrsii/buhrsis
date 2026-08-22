@@ -140,3 +140,9 @@ body:not(.locked) #hatchV06[hidden]{z-index:-1!important}
 .profile-card[data-nav0152="1"],.child-card[data-nav0152="1"],[data-child-id][data-nav0152="1"]{
   cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important
 }
+
+.open-child0153{
+ width:calc(100% - 20px);margin:10px 10px 4px;padding:12px 14px;border:0;border-radius:12px;
+ background:#ffc45a;color:#111;font-weight:900;font-size:12px;letter-spacing:.04em;
+ pointer-events:auto!important;touch-action:manipulation!important;position:relative;z-index:20
+}

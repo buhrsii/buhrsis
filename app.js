@@ -606,3 +606,15 @@ window.addEventListener("load",()=>{
  window.addEventListener("load",()=>setTimeout(wireParentCards,500));
  window.wireParentCards0152=wireParentCards;
 })();
+
+// v0.15.3 keep explicit parent actions attached after every parent-list render
+(function(){
+ function attach(){window.renderParentChildActions0153?.()}
+ const list=()=>document.getElementById("parentList");
+ const start=()=>{
+   attach();
+   const el=list();if(el)new MutationObserver(attach).observe(el,{childList:true,subtree:true});
+ };
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
+ setTimeout(attach,500);setTimeout(attach,1500);
+})();

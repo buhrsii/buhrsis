@@ -147,3 +147,33 @@ window.parentOpenChild0152=function(profile){
   try{app(true)}catch(e){try{showApp?.()}catch(_){}}
   try{render?.()}catch(e){}
 };
+
+// v0.15.3 explicit parent child controls
+window.renderParentChildActions0153=function(){
+ const list=document.getElementById("parentList");
+ if(!list)return;
+ [...list.children].forEach((card,i)=>{
+   if(card.querySelector(".open-child0153"))return;
+   const btn=document.createElement("button");
+   btn.type="button";btn.className="open-child0153";
+   btn.textContent="ALS KIND STARTEN";
+   btn.addEventListener("click",async e=>{
+     e.preventDefault();e.stopPropagation();
+     const username=(card.textContent.match(/@([a-zA-Z0-9._-]+)/)||[])[1]||"";
+     if(!username)return;
+     const {data,error}=await sb.from("child_profiles").select("*").eq("username",username).limit(1).maybeSingle();
+     if(error||!data){console.error(error);return}
+     child=data;childModeSession=false;
+     try{
+       localStorage.setItem("buhrsiChild",JSON.stringify(data));
+       localStorage.setItem("buhrsiChildMode","0");
+       window.BuhrsiDeviceSession?.saveChild?.(data);
+     }catch(_){}
+     document.body.classList.remove("locked");
+     try{$("#profileName").textContent=data.name}catch(_){}
+     try{app(true)}catch(_){try{showApp?.()}catch(__){}}
+     try{render?.()}catch(_){}
+   });
+   card.appendChild(btn);
+ });
+};

@@ -1,14 +1,15 @@
-Buhrsi's v0.15.2 – Elternbereich Sackgasse behoben
-- Vorhandene Kinderkarten im Elternbereich sind jetzt auswählbar.
-- Antippen eines Kindes öffnet dessen Buhrsi-/Zahnputz-Hauptseite.
-- Ausgewähltes Kind wird als zuletzt verwendetes Profil auf dem Gerät gespeichert.
-- Parent-/Overlay-Locks werden beim Wechsel entfernt.
-- Tastaturbedienung Enter/Space für Kinderkarten ergänzt.
-- Bestehender 45-Sekunden-Testmodus, Sounds, Rangliste und persistenter Login bleiben erhalten.
-- Keine Supabase-Änderung.
+Buhrsi's v0.15.3 – Elternbereich explizite Navigation
 
-GitHub:
-Alle Dateien ersetzen, main committen, iPhone-App vollständig schließen und neu öffnen.
+v0.15.2 war zu indirekt: Es versuchte bestehende Profilkarten über generische Selektoren klickbar zu machen.
+v0.15.3 hängt stattdessen direkt an die tatsächliche Elternliste `#parentList` unter jedes Kinderprofil einen sichtbaren Button:
 
-Test:
-Elternbereich -> Emil/Anton antippen -> jeweilige Hauptseite muss direkt erscheinen und bedienbar sein.
+ALS KIND STARTEN
+
+Der Button:
+- ermittelt das konkrete Profil über dessen @Benutzername
+- setzt dieses Profil als aktives Kind
+- speichert es als letztes Geräteprofil
+- verlässt den Elternbereich und öffnet die Zahnputz-Hauptseite
+
+Keine Supabase-Änderung.
+45-Sekunden-Testmodus und bestehende Sounds bleiben unverändert.
