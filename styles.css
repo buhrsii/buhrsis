@@ -44,3 +44,38 @@ body{padding:0!important}
 nav,.bottom-nav,.tabbar{
   padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
 }
+
+/* v0.7.6: Safe Areas für alle Dialoge/Overlays */
+dialog,
+.modal,
+.popup,
+.overlay,
+.tips-modal,
+.tips-popup,
+.reward-modal,
+.reward-overlay,
+.hatch-v06 {
+  box-sizing:border-box;
+  padding-top:max(24px,env(safe-area-inset-top))!important;
+  padding-right:max(18px,env(safe-area-inset-right))!important;
+  padding-bottom:max(24px,env(safe-area-inset-bottom))!important;
+  padding-left:max(18px,env(safe-area-inset-left))!important;
+}
+dialog::backdrop{background:#000a}
+.modal-content,
+.popup-content,
+.tips-content,
+.reward-card,
+.hatch-stage {
+  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 48px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+@media(max-width:600px){
+  dialog,.modal,.popup,.overlay,.tips-modal,.tips-popup,.reward-modal,.reward-overlay,.hatch-v06{
+    align-items:flex-start!important;
+  }
+  .modal-content,.popup-content,.tips-content,.reward-card,.hatch-stage{
+    margin-top:12px!important;
+  }
+}
