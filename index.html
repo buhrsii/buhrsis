@@ -15,7 +15,7 @@
 <label>4-stellige PIN<input id="childPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label><button class="primary" type="submit">KINDERKONTO ANLEGEN</button></form></div>
 <p id="cloudMessage" class="cloud-message"></p></div></section><main class="app">
 <header class="top"><div class="profile"><div class="avatar">B</div><b id="profileName">Buhrsi’s</b></div><div class="currencies"><span>⭐ <b id="xpTop">120</b> XP</span><span>✨ <b id="glanzHome">68</b></span></div><button id="logoutBtn" class="logout-btn" type="button">Abmelden</button></header>
-<section class="hero card"><div class="hero-copy"><p class="eyebrow">LOS GEHT'S! ✦</p><h1>Putze deine Zähne</h1><div class="timer" id="timer"><span id="time">02:00</span><small id="zone">Bereit?</small></div><button class="secondary" id="tips">🪥 Zahnputz-Tipps</button></div><div class="creature-wrap"><div class="creature" id="creature"><i class="ear e1"></i><i class="ear e2"></i><i class="eye x1"></i><i class="eye x2"></i><i class="mouth"></i><i class="spot s1"></i><i class="spot s2"></i></div><button class="primary" id="start">🪥 PUTZEN STARTEN</button></div></section>
+<section class="hero card"><div class="hero-copy"><p class="eyebrow">LOS GEHT'S! ✦</p><h1>Putze deine Zähne</h1><div class="timer" id="timer"><span id="time">02:00</span><small id="zone">Bereit?</small></div></div><div class="creature-wrap"><div class="creature" id="creature"><i class="ear e1"></i><i class="ear e2"></i><i class="eye x1"></i><i class="eye x2"></i><i class="mouth"></i><i class="spot s1"></i><i class="spot s2"></i></div><button class="primary" id="start">🪥 PUTZEN STARTEN</button></div></section>
 <section class="grid"><article class="card stat"><h2>⭐ LEVEL <span id="level">1</span></h2><div class="bar"><i id="xpBar"></i></div><p><span id="xpToNext">80</span> XP bis Level 2</p></article><article class="card stat"><h2>🔥 PUTZSTREAK</h2><strong><span id="streak">0</span> TAGE</strong><p>Jeder Putztag zählt.</p><div class="week" id="week"></div></article></section>
 <section class="card egg"><div class="egg-art"><div class="egg-shape">✦</div></div><div><h2>EIN NEUES BUHRSI ENTDECKEN</h2><p>Dein Ei sammelt Energie...</p><div class="bar"><i id="eggBar"></i></div><small><span id="eggXp">0</span> / 200 XP</small></div></section>
 <section class="card collection"><div class="section-title"><h2>DEINE BUHRSI'S</h2><span>1 entdeckt</span></div><div class="creature-card"><div class="mini-creature"></div><b>Erstes Buhrsi</b><small>Lv. <span id="miniLevel">1</span></small><em>HÄUFIG</em></div></section>
@@ -39,17 +39,5 @@
   </div>
   <div class="hatch-result"><strong class="hatch-rarity">?</strong><span class="hatch-value">Sammlerwert wird bestimmt …</span></div>
   <button id="hatchContinue" class="primary" type="button">MEIN BUHRSI ANSEHEN</button>
- </div>
-</section><section id="tipsDialog" class="tips-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="tipsTitle">
- <div class="tips-dialog-card">
-  <button id="closeTipsDialog" class="tips-close" type="button" aria-label="Tipps schließen">×</button>
-  <span class="eyebrow">ZAHNPUTZ-TIPPS</span>
-  <h2 id="tipsTitle">So wird richtig geputzt</h2>
-  <div class="tips-list">
-   <div><b>01</b><p><strong>30 Sekunden pro Bereich</strong><span>Oben links, oben rechts, unten links und unten rechts.</span></p></div>
-   <div><b>02</b><p><strong>Sanft kreisen</strong><span>Kein starkes Schrubben. Kleine, ruhige Bewegungen reichen.</span></p></div>
-   <div><b>03</b><p><strong>Alle Flächen</strong><span>Außenflächen, Innenflächen und Kauflächen nicht vergessen.</span></p></div>
-  </div>
-  <button id="tipsOkay" class="primary" type="button">VERSTANDEN</button>
  </div>
 </section></body></html>

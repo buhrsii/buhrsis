@@ -139,20 +139,10 @@ render();
  setTimeout(window.refreshCollection,1200);
 })();
 
-// v0.8.1 real toothbrushing tips dialog
-(function(){
- const dialog=document.getElementById("tipsDialog");
- const close=()=>{dialog.hidden=true;document.documentElement.classList.remove("tips-open")};
- const open=()=>{dialog.hidden=false;document.documentElement.classList.add("tips-open")};
- document.addEventListener("click",e=>{
-   const b=e.target.closest("button,a");
-   if(!b)return;
-   const txt=(b.textContent||"").trim().toLowerCase();
-   if(txt.includes("zahnputz")&&txt.includes("tipp")){
-     e.preventDefault(); e.stopImmediatePropagation(); open();
-   }
- },true);
- document.getElementById("closeTipsDialog")?.addEventListener("click",close);
- document.getElementById("tipsOkay")?.addEventListener("click",close);
- dialog?.addEventListener("click",e=>{if(e.target===dialog)close()});
-})();
+// v0.8.2: Zahnputz-Tipps vollständig entfernt.
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll("button,a").forEach(el=>{
+    const t=(el.textContent||"").toLowerCase();
+    if(t.includes("zahnputz")&&t.includes("tipp")) el.remove();
+  });
+});
