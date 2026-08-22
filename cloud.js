@@ -13,3 +13,16 @@ $("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=awa
 $("#logoutBtn").onclick=async()=>{sessionStorage.removeItem("buhrsiChild");child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView")};
 try{let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=m.createClient(SUPABASE_URL,SUPABASE_KEY);let saved=sessionStorage.getItem("buhrsiChild");if(saved)choose(JSON.parse(saved),true);else{let {data}=await sb.auth.getSession();user=data.session?.user||null;if(user)await profiles();else{app(false);show("roleView")}}}catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
 window.BuhrsiCloud={get child(){return child},async saveProgress(p){if(!sb||!child||childModeSession)return {ok:false};let {data,error}=await sb.from("child_profiles").update({xp:+p.xp||0,gloss:Math.max(0,Math.min(100,+p.gloss||0)),streak:+p.streak||0,egg_energy:+p.eggEnergy||0}).eq("id",child.id).select().single();if(!error)child=data;return {ok:!error,data,error}},async logBrush(){}};
+
+window.BuhrsiCollection={
+ async list(){
+   if(!sb||!child||childModeSession) return [];
+   const {data,error}=await sb.from("buhrsis").select("*").eq("child_id",child.id).order("born_at",{ascending:false});
+   if(error){console.error(error);return []} return data||[];
+ },
+ async hatch(){
+   if(!sb||!child||childModeSession) return null;
+   const {data,error}=await sb.rpc("hatch_buhrsi",{p_child:child.id});
+   if(error){console.error(error);return null} child.egg_energy=0; return data;
+ }
+};

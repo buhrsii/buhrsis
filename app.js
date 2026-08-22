@@ -127,3 +127,32 @@ render();
    const ov=document.getElementById("hatchV06"); ov.hidden=true; ov.className="hatch-v06";
  });
 })();
+
+// v0.8 persistent collection UI
+(async function(){
+ const grid=document.getElementById("buhrsiGrid"), count=document.getElementById("collectionCount"), detail=document.getElementById("buhrsiDetail");
+ function label(r){return ({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR"})[r]||r}
+ function card(b){let el=document.createElement("button");el.className="buhrsi-card";el.dataset.rarity=b.rarity;el.innerHTML=`<div class="mini-toy ${b.variant}"><i></i><b></b></div><strong>${b.species}</strong><small>${label(b.rarity)}</small><span>${b.current_value} Wert</span>`;el.onclick=()=>open(b);return el}
+ function open(b){document.getElementById("detailRarity").textContent=label(b.rarity);document.getElementById("detailName").textContent=b.species;document.getElementById("detailValue").textContent=b.current_value;document.getElementById("detailBond").textContent=b.bond;document.getElementById("detailGloss").textContent=b.gloss;document.getElementById("detailToy").className="mini-toy "+b.variant;detail.hidden=false}
+ document.getElementById("closeBuhrsiDetail")?.addEventListener("click",()=>detail.hidden=true);
+ window.refreshCollection=async()=>{let api=window.BuhrsiCollection;if(!api)return;let a=await api.list();if(!grid)return;grid.innerHTML="";count.textContent=a.length+" entdeckt";if(!a.length)grid.innerHTML='<p class="empty-collection">Dein erstes Buhrsi wartet noch im Ei.</p>';else a.forEach(b=>grid.append(card(b)))};
+ setTimeout(window.refreshCollection,1200);
+})();
+
+// v0.8.1 real toothbrushing tips dialog
+(function(){
+ const dialog=document.getElementById("tipsDialog");
+ const close=()=>{dialog.hidden=true;document.documentElement.classList.remove("tips-open")};
+ const open=()=>{dialog.hidden=false;document.documentElement.classList.add("tips-open")};
+ document.addEventListener("click",e=>{
+   const b=e.target.closest("button,a");
+   if(!b)return;
+   const txt=(b.textContent||"").trim().toLowerCase();
+   if(txt.includes("zahnputz")&&txt.includes("tipp")){
+     e.preventDefault(); e.stopImmediatePropagation(); open();
+   }
+ },true);
+ document.getElementById("closeTipsDialog")?.addEventListener("click",close);
+ document.getElementById("tipsOkay")?.addEventListener("click",close);
+ dialog?.addEventListener("click",e=>{if(e.target===dialog)close()});
+})();

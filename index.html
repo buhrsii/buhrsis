@@ -25,7 +25,13 @@
   <p>Jede abgeschlossene Putzrunde gibt dem Ei Energie.</p>
   <div class="egg-v05-bar"><i class="egg-v05-fill"></i></div><strong class="egg-v05-label">0 / 100 Energie</strong></div>
   <div class="egg-v05-art" aria-hidden="true"><div class="crack c1"></div><div class="crack c2"></div></div>
-</section></main><script src="app.js"></script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script><script type="module" src="cloud.js"></script><section id="hatchV06" class="hatch-v06" hidden aria-live="polite">
+</section><section class="collection-v08" id="collectionV08">
+<div class="collection-head"><div><span class="eyebrow">SAMMLUNG</span><h2>Meine Buhrsi’s</h2></div><span id="collectionCount">0 entdeckt</span></div>
+<div id="buhrsiGrid" class="buhrsi-grid"><p class="empty-collection">Dein erstes Buhrsi wartet noch im Ei.</p></div>
+</section>
+<section id="buhrsiDetail" class="buhrsi-detail" hidden><div class="buhrsi-detail-card"><button id="closeBuhrsiDetail" type="button">×</button>
+<div id="detailToy" class="mini-toy"></div><span id="detailRarity" class="eyebrow"></span><h2 id="detailName">Buhrsi</h2>
+<div class="detail-stats"><div><small>Sammlerwert</small><b id="detailValue">0</b></div><div><small>Bindung</small><b id="detailBond">50</b></div><div><small>Glanz</small><b id="detailGloss">50</b></div></div></div></section></main><script src="app.js"></script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script><script type="module" src="cloud.js"></script><section id="hatchV06" class="hatch-v06" hidden aria-live="polite">
  <div class="hatch-stage">
   <p class="eyebrow">ETWAS PASSIERT …</p><h2>Dein Ei schlüpft!</h2>
   <div class="hatch-visual"><div class="hatch-egg"><i></i><b></b></div>
@@ -33,5 +39,17 @@
   </div>
   <div class="hatch-result"><strong class="hatch-rarity">?</strong><span class="hatch-value">Sammlerwert wird bestimmt …</span></div>
   <button id="hatchContinue" class="primary" type="button">MEIN BUHRSI ANSEHEN</button>
+ </div>
+</section><section id="tipsDialog" class="tips-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="tipsTitle">
+ <div class="tips-dialog-card">
+  <button id="closeTipsDialog" class="tips-close" type="button" aria-label="Tipps schließen">×</button>
+  <span class="eyebrow">ZAHNPUTZ-TIPPS</span>
+  <h2 id="tipsTitle">So wird richtig geputzt</h2>
+  <div class="tips-list">
+   <div><b>01</b><p><strong>30 Sekunden pro Bereich</strong><span>Oben links, oben rechts, unten links und unten rechts.</span></p></div>
+   <div><b>02</b><p><strong>Sanft kreisen</strong><span>Kein starkes Schrubben. Kleine, ruhige Bewegungen reichen.</span></p></div>
+   <div><b>03</b><p><strong>Alle Flächen</strong><span>Außenflächen, Innenflächen und Kauflächen nicht vergessen.</span></p></div>
+  </div>
+  <button id="tipsOkay" class="primary" type="button">VERSTANDEN</button>
  </div>
 </section></body></html>
