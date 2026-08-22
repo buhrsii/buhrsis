@@ -164,3 +164,14 @@ document.addEventListener("DOMContentLoaded",()=>{
    if(r?.ok)render(r.profile,r.brushes_today,r.perfect_day);
  });
 })();
+
+// v0.10 parent administration
+(function(){
+ let selected=null;const modal=document.getElementById("parentAdmin010"),msg=document.getElementById("adminMsg010");
+ window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");msg.textContent="";modal.hidden=false};
+ const close=()=>{modal.hidden=true;selected=null};
+ document.getElementById("adminClose010")?.addEventListener("click",close);
+ document.getElementById("resetPin010")?.addEventListener("click",async()=>{if(!selected)return;let pin=prompt("Neue 4-stellige PIN:");if(!/^\d{4}$/.test(pin||""))return msg.textContent="Bitte genau 4 Ziffern eingeben.";let r=await window.BuhrsiAdmin.resetPin(selected.id,pin);msg.textContent=r.ok?"PIN wurde geändert.":"PIN konnte nicht geändert werden."});
+ document.getElementById("resetProgress010")?.addEventListener("click",async()=>{if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;let r=await window.BuhrsiAdmin.resetProgress(selected.id);msg.textContent=r.ok?"Spielstand wurde zurückgesetzt.":"Zurücksetzen fehlgeschlagen."});
+ document.getElementById("deleteChild010")?.addEventListener("click",async()=>{if(!selected||!confirm("Kinderkonto wirklich vollständig löschen? Dieser Schritt kann nicht rückgängig gemacht werden."))return;let r=await window.BuhrsiAdmin.deleteChild(selected.id);if(r.ok){close();await window.BuhrsiAdmin.reload()}else msg.textContent="Löschen fehlgeschlagen."});
+})();

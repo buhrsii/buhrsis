@@ -4,7 +4,7 @@ const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"
 function show(id){["roleView","childLoginView","authView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
 function app(on){$("#authGate").hidden=on;$(".app").hidden=!on}
 function choose(p,isChild=false){child=p;childModeSession=isChild;$("#profileName").textContent=p.name;sessionStorage.setItem("buhrsiChild",JSON.stringify(p));app(true)}
-async function profiles(){let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");if(error)return msg(error.message);show("profileView");$("#profileList").innerHTML="";(data||[]).forEach(p=>{let b=document.createElement("button");b.className="profile-choice";b.type="button";b.innerHTML=`<b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small>`;b.onclick=()=>choose(p);$("#profileList").append(b)})}
+async function profiles(){let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");if(error)return msg(error.message);show("profileView");$("#profileList").innerHTML="";(data||[]).forEach(p=>{let b=document.createElement("button");b.className="profile-choice";b.type="button";b.innerHTML=`<b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small>`;b.onclick=()=>window.openParentAdmin010?window.openParentAdmin010(p):choose(p);$("#profileList").append(b)})}
 $("#childMode").onclick=()=>{msg();show("childLoginView")}; $("#parentMode").onclick=()=>{msg();show("authView")};
 document.querySelectorAll(".back-auth").forEach(b=>b.onclick=()=>{msg();show("roleView")});
 $("#childLoginForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("verify_child_pin",{p_username:$("#childUsernameLogin").value.trim(),p_pin:$("#childPinLogin").value});if(error)return msg(error.message);if(!data?.length)return msg("Name oder PIN stimmt nicht.");choose(data[0],true)};
@@ -35,4 +35,11 @@ window.BuhrsiStreaks={
    child=data.profile;return {ok:true,...data}
  },
  profile(){return child}
+};
+
+window.BuhrsiAdmin={
+ async resetProgress(id){const {error}=await sb.rpc("reset_child_progress",{p_child:id});return {ok:!error,error}},
+ async deleteChild(id){const {error}=await sb.rpc("delete_child_account",{p_child:id});return {ok:!error,error}},
+ async resetPin(id,pin){const {error}=await sb.rpc("reset_child_pin",{p_child:id,p_pin:pin});return {ok:!error,error}},
+ async reload(){await profiles()}
 };
