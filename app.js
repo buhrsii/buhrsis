@@ -487,3 +487,52 @@ window.addEventListener("load",()=>{
    }
  },250);
 });
+
+// v0.14.9 XP leaderboard
+(function(){
+ async function loadBoard(){
+   const box=document.getElementById("leaderList0149");if(!box)return;
+   const rows=await window.BuhrsiLeaderboard?.load?.()||[];
+   box.innerHTML="";
+   if(!rows.length){box.innerHTML="<p>Noch keine Ranglistendaten.</p>";return}
+   rows.slice(0,20).forEach((r,i)=>{
+     const el=document.createElement("div");el.className="leader-row0149"+(r.is_me?" me":"");
+     const medal=r.rank==1?"🥇":r.rank==2?"🥈":r.rank==3?"🥉":"#"+r.rank;
+     el.innerHTML=`<b>${medal}</b><span><strong>${r.display_name}</strong><small>🔥 ${r.streak||0} Tage</small></span><em>${r.xp||0} XP</em>`;
+     box.append(el);
+   });
+ }
+ window.refreshLeaderboard=loadBoard;
+ setTimeout(loadBoard,1200);
+ window.addEventListener("buhrsi:brush-complete",()=>setTimeout(loadBoard,700));
+})();
+
+// v0.15.0 child onboarding guard
+(function(){
+ async function enterNewestChild(){
+   try{
+     if(!sb)return false;
+     const {data:{session}}=await sb.auth.getSession();
+     if(!session)return false;
+     const {data,error}=await sb.from("child_profiles")
+       .select("*").eq("parent_id",session.user.id)
+       .order("created_at",{ascending:false}).limit(1).maybeSingle();
+     if(error||!data)return false;
+     child=data;childModeSession=false;
+     try{localStorage.setItem("buhrsiChild",JSON.stringify(data));localStorage.setItem("buhrsiChildMode","0")}catch(e){}
+     try{window.BuhrsiDeviceSession?.saveChild?.(data)}catch(e){}
+     document.body.classList.remove("locked");
+     document.querySelectorAll(".overlay.open,.modal.open,.popup.open").forEach(x=>x.classList.remove("open"));
+     try{showApp?.()}catch(e){try{app?.(true)}catch(_){}}
+     try{render?.()}catch(e){}
+     return true;
+   }catch(e){console.error("enter newest child",e);return false}
+ }
+ // After any successful child-create interaction, re-check and enter newest child.
+ document.addEventListener("click",e=>{
+   const b=e.target.closest("#createChildBtn,#childCreateBtn,[data-action='create-child']");
+   if(!b)return;
+   setTimeout(enterNewestChild,900);
+ },true);
+ window.enterNewestChild0150=enterNewestChild;
+})();

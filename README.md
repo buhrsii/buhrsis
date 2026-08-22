@@ -1,16 +1,10 @@
-Buhrsi's v0.14.7 – Anmeldung merken
-- Supabase-Elternsession bleibt auf dem Gerät gespeichert und wird automatisch erneuert.
-- Das zuletzt verwendete Kinderprofil wird lokal auf diesem Gerät gespeichert.
-- Beim erneuten Öffnen versucht die App automatisch, Elternsession + Kinderprofil wiederherzustellen.
-- Wenn die Session abgelaufen/ungültig ist, bleibt die normale Anmeldung erhalten.
-- 45-Sekunden-Testtimer bleibt unverändert.
-- Keine Supabase-Migration nötig.
+Buhrsi's v0.15.0 – Kinderkonto-Onboarding Fix
+- Nach dem Anlegen eines Kinderkontos wird das neu angelegte Profil automatisch geöffnet.
+- Das Profil wird direkt als zuletzt verwendetes Profil auf dem Gerät gespeichert.
+- Alte offene Modal-/Overlay-Zustände werden beim Übergang entfernt.
+- Kinderprofil-Auswahl bleibt antippbar.
+- Ranglisten-Frontend wurde an die korrigierte SQL-Funktion angepasst: Name, XP, Streak; kein perfect_streak.
+- 45-Sekunden-Testmodus, Sounds, Hatch-Fix und persistenter Kinderlogin bleiben enthalten.
 
-Test:
-1. Einmal normal anmelden und Kinderprofil öffnen.
-2. App vollständig schließen.
-3. App erneut öffnen.
-4. Sie sollte automatisch wieder in das zuletzt verwendete Kinderprofil wechseln.
-
-Sicherheit:
-Das ist Gerätekomfort, kein Ersatz für die spätere zusätzliche Elternbereich-Sperre. Explizites Abmelden soll die Session weiterhin beenden.
+Kein neuer Supabase-Schritt nötig, wenn die korrigierte Ranglisten-SQL bereits erfolgreich ausgeführt wurde.
+Alle Dateien ins bestehende GitHub-Repo hochladen und main committen.
