@@ -102,3 +102,5 @@ nav,.bottom-nav,.tabbar{
 @media(max-width:600px){
   :root{--buhrsi-bottom-nav-space:calc(124px + env(safe-area-inset-bottom))}
 }
+
+.value-info014{margin:14px 0 4px;padding:14px 15px;border-radius:16px;background:#191f20;border:1px solid #303737}.value-info014 span{font-size:11px;font-weight:900;letter-spacing:.12em;color:#f6bd55}.value-info014 p{font-size:12px;line-height:1.5;color:#9ca5a2;margin:6px 0 0}.evo-tag{font-style:normal;font-size:9px;color:#7f8986;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}

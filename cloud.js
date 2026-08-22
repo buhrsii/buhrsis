@@ -58,3 +58,16 @@ window.BuhrsiHatch={
  },
  profile(){return child}
 };
+
+window.BuhrsiEvolution={
+ async refresh(){
+   if(!sb||!child||childModeSession)return [];
+   const {data,error}=await sb.rpc("update_buhrsi_values",{p_child:child.id});
+   if(error){console.error(error);return []}return data||[];
+ },
+ async rewardBrush(){
+   if(!sb||!child||childModeSession)return false;
+   const {error}=await sb.rpc("feed_buhrsi_brush_xp",{p_child:child.id});
+   return !error;
+ }
+};

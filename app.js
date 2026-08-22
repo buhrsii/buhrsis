@@ -335,3 +335,20 @@ window.addEventListener("pageshow",()=>{
 });
 
 document.addEventListener("DOMContentLoaded",prepareBrushAudio);
+
+// v0.14 Buhrsi evolution/value layer
+(function(){
+ function decorate(){
+   document.querySelectorAll(".buhrsi-card").forEach(card=>{
+     if(card.querySelector(".evo-tag"))return;
+     const tag=document.createElement("em");tag.className="evo-tag";tag.textContent="Lebendiger Sammlerwert";card.append(tag);
+   });
+ }
+ setInterval(decorate,1800);
+ window.addEventListener("buhrsi:brush-complete",async()=>{
+   await window.BuhrsiEvolution?.rewardBrush?.();
+   await window.BuhrsiEvolution?.refresh?.();
+   window.refreshCollection?.();
+ });
+ setTimeout(async()=>{await window.BuhrsiEvolution?.refresh?.();window.refreshCollection?.()},1800);
+})();
