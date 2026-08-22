@@ -195,9 +195,7 @@ render();
      ov.querySelector(".hatch-value").textContent=value+" Sammlerwert";
    },1900);
  }
- document.getElementById("hatchContinue")?.addEventListener("click",()=>{
-   const ov=document.getElementById("hatchV06"); ov.hidden=true; ov.className="hatch-v06";
- });
+ 
 })();
 
 // v0.8 persistent collection UI
@@ -371,3 +369,32 @@ document.addEventListener("click",e=>{
  reward?.classList.remove("open");brush?.classList.remove("open","finale");
  document.body.classList.remove("locked");
 },true);
+
+// v0.14.2 authoritative hatch completion flow
+(function(){
+ function closeHatchAndReturn(){
+   const ov=document.getElementById("hatchV06");
+   const reward=document.getElementById("reward");
+   const brush=document.getElementById("brushScreen");
+   if(ov){
+     ov.hidden=true;
+     ov.classList.remove("hatching","cracked","revealed");
+     ov.style.pointerEvents="none";
+   }
+   reward?.classList.remove("open");
+   brush?.classList.remove("open","finale");
+   document.body.classList.remove("locked");
+   document.documentElement.classList.remove("tips-open");
+   try{ finishing=false; }catch(e){}
+   try{ window.refreshCollection?.(); }catch(e){}
+   window.scrollTo({top:0,left:0,behavior:"instant"});
+ }
+ document.addEventListener("click",e=>{
+   const b=e.target.closest("#hatchContinue");
+   if(!b)return;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   closeHatchAndReturn();
+ },true);
+ window.closeHatchAndReturn=closeHatchAndReturn;
+})();

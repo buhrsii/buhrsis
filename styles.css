@@ -109,3 +109,7 @@ nav,.bottom-nav,.tabbar{
 .reward:not(.open),#brushScreen:not(.open){pointer-events:none!important}
 .reward.open,#brushScreen.open{pointer-events:auto!important}
 body:not(.locked){overflow:auto!important;touch-action:auto!important}
+
+/* v0.14.2 hatch overlay must never survive after it is hidden */
+#hatchV06[hidden]{display:none!important;pointer-events:none!important;visibility:hidden!important}
+#hatchV06:not([hidden]){pointer-events:auto!important;visibility:visible!important}
