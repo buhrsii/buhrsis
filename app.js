@@ -536,3 +536,34 @@ window.addEventListener("load",()=>{
  },true);
  window.enterNewestChild0150=enterNewestChild;
 })();
+
+// v0.15.1 parent-area interaction safety
+(function(){
+ function unlockParentUI(){
+   const parent=document.querySelector("#parentScreen,.parent-screen,#parentArea,.parent-area,[data-screen='parent']");
+   if(!parent)return;
+   const visible=!parent.hidden && getComputedStyle(parent).display!=="none";
+   if(!visible)return;
+   document.body.classList.remove("locked");
+   document.body.style.pointerEvents="";
+   document.body.style.overflow="";
+   document.documentElement.style.pointerEvents="";
+   document.documentElement.style.overflow="";
+   ["reward","brushScreen","hatchV06"].forEach(id=>{
+     const x=document.getElementById(id);
+     if(!x)return;
+     x.classList.remove("open","finale");
+     if(id==="hatchV06")x.hidden=true;
+   });
+   parent.style.pointerEvents="auto";
+   parent.querySelectorAll("button,a,input,select,textarea,[role='button']").forEach(x=>{
+     x.style.pointerEvents="auto";x.style.touchAction="manipulation";
+   });
+ }
+ new MutationObserver(unlockParentUI).observe(document.body,{subtree:true,attributes:true,attributeFilter:["class","hidden","style"]});
+ document.addEventListener("click",e=>{
+   if(e.target.closest("#parentScreen,.parent-screen,#parentArea,.parent-area,[data-screen='parent']")) unlockParentUI();
+ },true);
+ window.addEventListener("load",()=>setTimeout(unlockParentUI,400));
+ window.unlockParentUI0151=unlockParentUI;
+})();

@@ -1,10 +1,9 @@
-Buhrsi's v0.15.0 – Kinderkonto-Onboarding Fix
-- Nach dem Anlegen eines Kinderkontos wird das neu angelegte Profil automatisch geöffnet.
-- Das Profil wird direkt als zuletzt verwendetes Profil auf dem Gerät gespeichert.
-- Alte offene Modal-/Overlay-Zustände werden beim Übergang entfernt.
-- Kinderprofil-Auswahl bleibt antippbar.
-- Ranglisten-Frontend wurde an die korrigierte SQL-Funktion angepasst: Name, XP, Streak; kein perfect_streak.
-- 45-Sekunden-Testmodus, Sounds, Hatch-Fix und persistenter Kinderlogin bleiben enthalten.
+Buhrsi's v0.15.1 – Elternbereich Interaktions-Fix
+- Entfernt den zu aggressiven v0.15.0-Auto-Weiter-Hook, der den Elternbereich beeinflussen konnte.
+- Elternbereich entfernt geerbte body/pointer/scroll Locks.
+- Reward-, Brush- und Hatch-Overlays werden im sichtbaren Elternbereich geschlossen.
+- Buttons und Formulare im Elternbereich werden explizit wieder interaktiv.
+- Rangliste, persistenter Kinderlogin und 45-Sekunden-Testmodus bleiben erhalten.
+- Keine Supabase-Änderung.
 
-Kein neuer Supabase-Schritt nötig, wenn die korrigierte Ranglisten-SQL bereits erfolgreich ausgeführt wurde.
-Alle Dateien ins bestehende GitHub-Repo hochladen und main committen.
+GitHub: alle Dateien ersetzen, main committen. Danach App vollständig schließen und neu öffnen.

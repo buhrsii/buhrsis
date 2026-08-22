@@ -131,3 +131,7 @@ body:not(.locked) #hatchV06[hidden]{z-index:-1!important}
 
 /* v0.15.0 onboarding: child choices must visibly behave as controls */
 .profile-card,.child-card,[data-child-id]{cursor:pointer;pointer-events:auto!important;touch-action:manipulation}
+
+/* v0.15.1 parent controls must stay interactive */
+#parentScreen,.parent-screen,#parentArea,.parent-area,[data-screen="parent"]{pointer-events:auto!important}
+#parentScreen button,.parent-screen button,#parentArea button,.parent-area button,[data-screen="parent"] button{pointer-events:auto!important;touch-action:manipulation!important}
