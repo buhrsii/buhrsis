@@ -1,8 +1,12 @@
-Buhrsi's v0.6
-- Screen Wake Lock während des Putzens
-- erneuter Wake Lock nach Rückkehr in die App
-- Freigabe nach Abschluss
-- erste Schlüpfsequenz
-- Seltenheits-Reveal und Sammlerwert-Prototyp
+Buhrsi's v0.7
+- Startauswahl Kind / Eltern
+- Kinderkonto mit eigenem Benutzernamen + 4-stelliger PIN
+- Eltern erstellen/verwalten Kinderkonten
+- Buhrsi-Code pro Kinderkonto
+- PIN wird nur gehasht gespeichert
+- Registrierung nutzt die aktuelle App-Domain als E-Mail-Redirect
 
-Für v0.6 ist keine neue SQL-Migration nötig. Dateien ins bestehende GitHub-Repo hochladen und auf main committen. Vercel aktualisiert automatisch.
+WICHTIG: zuerst `supabase-v07.sql` im Supabase SQL Editor ausführen.
+Danach Dateien ins bestehende GitHub-Repo hochladen und auf main committen.
+
+Sicherheitsnotiz: Kinder-PIN-Login ist in v0.7 ein Prototyp. Vor öffentlichem Produktivbetrieb sollte die PIN-Prüfung serverseitig mit Rate-Limiting und kurzlebigen signierten Sessions umgesetzt werden.

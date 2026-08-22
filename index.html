@@ -1,15 +1,19 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0e0f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Buhrsi's"><link rel="apple-touch-icon" href="icon-192.png"><title>Buhrsi's</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css"></head><body><section id="authGate" class="auth-gate"><div class="auth-card">
 <div class="auth-brand"><span>B</span><strong>Buhrsi’s</strong></div>
-<div id="authView"><p class="eyebrow">ELTERNBEREICH</p><h1>Willkommen bei Buhrsi’s</h1>
-<p class="auth-copy">Eltern melden sich an. Danach wählt das Kind nur noch sein Profil.</p>
-<form id="authForm"><label>E-Mail<input id="email" type="email" autocomplete="email" required></label>
-<label>Passwort<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
-<button class="primary" data-mode="login" type="submit">ANMELDEN</button>
-<button class="secondary" data-mode="signup" type="submit">ELTERNKONTO ERSTELLEN</button></form></div>
-<div id="profileView" hidden><p class="eyebrow">KINDERPROFIL</p><h1>Wer putzt heute?</h1>
-<div id="profileList"></div><form id="childForm"><label>Name des Kindes<input id="childName" maxlength="30" placeholder="z. B. Ben" required></label>
-<button class="primary" type="submit">PROFIL ANLEGEN</button></form></div>
-<p id="cloudMessage" class="cloud-message" aria-live="polite"></p></div></section><main class="app">
+<div id="roleView"><p class="eyebrow">WILLKOMMEN</p><h1>Wer bist du?</h1>
+<button id="childMode" class="role-btn" type="button">🐾 <b>KIND</b><small>Ich möchte putzen</small></button>
+<button id="parentMode" class="role-btn" type="button">⚙️ <b>ELTERN</b><small>Elternbereich</small></button></div>
+<div id="childLoginView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">KINDER-LOGIN</p><h1>Willkommen zurück</h1>
+<form id="childLoginForm"><label>Buhrsi-Name<input id="childUsernameLogin" maxlength="20" autocomplete="username" required></label>
+<label>4-stellige PIN<input id="childPinLogin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label>
+<button class="primary" type="submit">LOS GEHT’S</button></form></div>
+<div id="authView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">ELTERNBEREICH</p><h1>Elternkonto</h1>
+<form id="authForm"><label>E-Mail<input id="email" type="email" autocomplete="email" required></label><label>Passwort<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
+<button class="primary" data-mode="login" type="submit">ANMELDEN</button><button class="secondary" data-mode="signup" type="submit">ELTERNKONTO ERSTELLEN</button></form></div>
+<div id="profileView" hidden><p class="eyebrow">ELTERNBEREICH</p><h1>Kinderkonten</h1><div id="profileList"></div>
+<form id="childForm"><label>Name<input id="childName" maxlength="30" required></label><label>Buhrsi-Benutzername<input id="childUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" required></label>
+<label>4-stellige PIN<input id="childPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label><button class="primary" type="submit">KINDERKONTO ANLEGEN</button></form></div>
+<p id="cloudMessage" class="cloud-message"></p></div></section><main class="app">
 <header class="top"><div class="profile"><div class="avatar">B</div><b id="profileName">Buhrsi’s</b></div><div class="currencies"><span>⭐ <b id="xpTop">120</b> XP</span><span>✨ <b id="glanzHome">68</b></span></div><button id="logoutBtn" class="logout-btn" type="button">Abmelden</button></header>
 <section class="hero card"><div class="hero-copy"><p class="eyebrow">LOS GEHT'S! ✦</p><h1>Putze deine Zähne</h1><div class="timer" id="timer"><span id="time">02:00</span><small id="zone">Bereit?</small></div><button class="secondary" id="tips">🪥 Zahnputz-Tipps</button></div><div class="creature-wrap"><div class="creature" id="creature"><i class="ear e1"></i><i class="ear e2"></i><i class="eye x1"></i><i class="eye x2"></i><i class="mouth"></i><i class="spot s1"></i><i class="spot s2"></i></div><button class="primary" id="start">🪥 PUTZEN STARTEN</button></div></section>
 <section class="grid"><article class="card stat"><h2>⭐ LEVEL <span id="level">1</span></h2><div class="bar"><i id="xpBar"></i></div><p><span id="xpToNext">80</span> XP bis Level 2</p></article><article class="card stat"><h2>🔥 PUTZSTREAK</h2><strong><span id="streak">0</span> TAGE</strong><p>Jeder Putztag zählt.</p><div class="week" id="week"></div></article></section>

@@ -1,57 +1,15 @@
-const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co";
-const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
-let sb,user,child;
-const $=s=>document.querySelector(s);
-function msg(t=""){$("#cloudMessage").textContent=t}
-function app(show){$("#authGate").hidden=show;$(".app").hidden=!show}
-async function profiles(){
- const {data,error}=await sb.from("child_profiles").select("*").order("created_at");
- if(error){msg(error.message);return}
- if(!data.length){$("#authView").hidden=true;$("#profileView").hidden=false;app(false);return}
- $("#profileList").innerHTML="";
- data.forEach(p=>{let b=document.createElement("button");b.type="button";b.className="profile-choice";b.textContent=p.name;b.onclick=()=>choose(p);$("#profileList").append(b)});
- $("#authView").hidden=true;$("#profileView").hidden=false;app(false)
-}
-function choose(p){child=p;$("#profileName").textContent=p.name;app(true)}
-async function gate(){
- const {data}=await sb.auth.getSession();user=data.session?.user||null;
- if(!user){$("#authView").hidden=false;$("#profileView").hidden=true;app(false);return}
- await profiles()
-}
-$("#authForm").addEventListener("submit",async e=>{
- e.preventDefault();msg();let email=$("#email").value.trim(),password=$("#password").value,mode=e.submitter.dataset.mode;
- if(mode==="signup"){let {error}=await sb.auth.signUp({email,password});if(error)return msg(error.message);msg("Konto erstellt. Prüfe ggf. deine E-Mail zur Bestätigung.");}
- else{let {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg("Anmeldung fehlgeschlagen: "+error.message);user=data.user;await profiles()}
-});
-$("#childForm").addEventListener("submit",async e=>{
- e.preventDefault();msg();let name=$("#childName").value.trim().slice(0,30);if(!name)return;
- let {data,error}=await sb.from("child_profiles").insert({parent_id:user.id,name}).select().single();
- if(error)return msg(error.message);choose(data)
-});
-$("#logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();user=child=null;await gate()});
-try{let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=m.createClient(SUPABASE_URL,SUPABASE_KEY);await gate()}
-catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
-
-window.BuhrsiCloud = {
-  get child(){ return child; },
-  async saveProgress(progress){
-    if(!sb || !user || !child) return {ok:false};
-    const payload={
-      xp: Math.max(0, Number(progress.xp)||0),
-      gloss: Math.max(0, Math.min(100, Number(progress.gloss)||0)),
-      streak: Math.max(0, Number(progress.streak)||0),
-      egg_energy: Math.max(0, Number(progress.eggEnergy)||0)
-    };
-    const {data,error}=await sb.from("child_profiles").update(payload).eq("id",child.id).select().single();
-    if(error){ console.error(error); return {ok:false,error}; }
-    child=data; return {ok:true,data};
-  },
-  async logBrush(duration=120,xpEarned=20,glossEarned=3){
-    if(!sb || !user || !child) return;
-    const {error}=await sb.from("brushing_sessions").insert({
-      child_id:child.id,parent_id:user.id,duration_seconds:duration,
-      xp_earned:xpEarned,gloss_earned:glossEarned
-    });
-    if(error) console.error(error);
-  }
-};
+const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co"; const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
+let sb,user,child,childModeSession=false;
+const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"";
+function show(id){["roleView","childLoginView","authView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
+function app(on){$("#authGate").hidden=on;$(".app").hidden=!on}
+function choose(p,isChild=false){child=p;childModeSession=isChild;$("#profileName").textContent=p.name;sessionStorage.setItem("buhrsiChild",JSON.stringify(p));app(true)}
+async function profiles(){let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");if(error)return msg(error.message);show("profileView");$("#profileList").innerHTML="";(data||[]).forEach(p=>{let b=document.createElement("button");b.className="profile-choice";b.type="button";b.innerHTML=`<b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small>`;b.onclick=()=>choose(p);$("#profileList").append(b)})}
+$("#childMode").onclick=()=>{msg();show("childLoginView")}; $("#parentMode").onclick=()=>{msg();show("authView")};
+document.querySelectorAll(".back-auth").forEach(b=>b.onclick=()=>{msg();show("roleView")});
+$("#childLoginForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("verify_child_pin",{p_username:$("#childUsernameLogin").value.trim(),p_pin:$("#childPinLogin").value});if(error)return msg(error.message);if(!data?.length)return msg("Name oder PIN stimmt nicht.");choose(data[0],true)};
+$("#authForm").onsubmit=async e=>{e.preventDefault();msg();let email=$("#email").value.trim(),password=$("#password").value,mode=e.submitter.dataset.mode;if(mode==="signup"){let {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(error)return msg(error.message);return msg("Konto erstellt. Bitte E-Mail bestätigen.")}let {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg("Anmeldung fehlgeschlagen: "+error.message);user=data.user;await profiles()};
+$("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("create_child_account",{p_name:$("#childName").value.trim(),p_username:$("#childUsername").value.trim(),p_pin:$("#childPin").value});if(error)return msg(error.message);$("#childForm").reset();await profiles()};
+$("#logoutBtn").onclick=async()=>{sessionStorage.removeItem("buhrsiChild");child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView")};
+try{let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=m.createClient(SUPABASE_URL,SUPABASE_KEY);let saved=sessionStorage.getItem("buhrsiChild");if(saved)choose(JSON.parse(saved),true);else{let {data}=await sb.auth.getSession();user=data.session?.user||null;if(user)await profiles();else{app(false);show("roleView")}}}catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
+window.BuhrsiCloud={get child(){return child},async saveProgress(p){if(!sb||!child||childModeSession)return {ok:false};let {data,error}=await sb.from("child_profiles").update({xp:+p.xp||0,gloss:Math.max(0,Math.min(100,+p.gloss||0)),streak:+p.streak||0,egg_energy:+p.eggEnergy||0}).eq("id",child.id).select().single();if(!error)child=data;return {ok:!error,data,error}},async logBrush(){}};
