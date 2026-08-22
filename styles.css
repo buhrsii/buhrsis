@@ -117,3 +117,12 @@ body:not(.locked){overflow:auto!important;touch-action:auto!important}
 /* v0.14.3: hard guarantee for hatch exit */
 #hatchV06[hidden]{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 body:not(.locked) #hatchV06[hidden]{z-index:-1!important}
+
+/* v0.14.4: hatch CTA must sit above the reveal layer and accept touch */
+#hatchV06.revealed #hatchContinue{
+  position:relative!important;
+  z-index:2147483646!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#hatchV06[aria-hidden="true"]{display:none!important;pointer-events:none!important}

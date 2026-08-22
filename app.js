@@ -1,7 +1,7 @@
 const $=s=>document.querySelector(s);
 const defaults={xp:120,glanz:68,streak:0,lastBrush:null,eggEnergy:0};
 const state={...defaults,...JSON.parse(localStorage.getItem('buhrsiState')||'{}')};
-let left=120,timer=null,lastZone=-1;
+let left=45,timer=null,lastZone=-1;
 const zones=[
   ['OBEN AUSSEN','Putze die Außenflächen oben'],
   ['UNTEN AUSSEN','Jetzt die Außenflächen unten'],
@@ -57,12 +57,13 @@ function brushVibrate(done=false){
 }
 function openBrush(){
  if(timer)return;
- initBrushAudio(); prepareBrushAudio(); unlockBrushAudio(); left=120;lastZone=-1;lastSignalZone=0;finishing=false;
- brushStartedAt=Date.now();brushEndAt=brushStartedAt+120000;
+ initBrushAudio(); prepareBrushAudio(); unlockBrushAudio(); left=45;lastZone=-1;lastSignalZone=0;finishing=false;
+ brushStartedAt=Date.now();brushEndAt=brushStartedAt+45000;
  sessionStorage.setItem("buhrsiBrushEndAt",String(brushEndAt));
  $('#brushScreen').classList.add('open');document.body.classList.add('locked');
- $('#brushTime').textContent='02:00';$('#brushRing').style.setProperty('--progress','0deg');updateZone(true);
+ $('#brushTime').textContent='00:45';$('#brushRing').style.setProperty('--progress','0deg');updateZone(true);
  window.dispatchEvent(new Event("buhrsi:brush-start"));
+ setTimeout(()=>brushTone(false),80);
  setTimeout(runTimer,250);
 }
 function runTimer(){
@@ -70,16 +71,18 @@ function runTimer(){
  const tick=()=>{
    if(!brushEndAt)brushEndAt=Number(sessionStorage.getItem("buhrsiBrushEndAt")||0);
    const remaining=Math.max(0,Math.ceil((brushEndAt-Date.now())/1000));
+   const previousLeft=left;
    left=remaining;
+   if(left>0 && left<=10 && left!==previousLeft) brushTone(false);
    $('#brushTime').textContent=format(left);
-   $('#brushRing').style.setProperty('--progress',((120-left)/120*360)+'deg');
+   $('#brushRing').style.setProperty('--progress',((45-left)/45*360)+'deg');
    updateZone();
    if(left<=0)finish();
  };
  tick();timer=setInterval(tick,250);
 }
 function updateZone(force=false){
- const elapsed=Math.min(120,Math.max(0,120-left)),zi=Math.min(3,Math.floor(elapsed/30));
+ const elapsed=Math.min(45,Math.max(0,45-left)),zi=Math.min(3,Math.floor(elapsed/11.25));
  if(force||zi!==lastZone){
    const previous=lastZone;lastZone=zi;
    $('#brushZone').textContent=zones[zi][0];$('#brushHint').textContent=zones[zi][1];
@@ -431,16 +434,45 @@ document.addEventListener("click",e=>{
  else bindHatchButton();
  window.hardCloseHatch0143=hardCloseHatch;
 
- // Final 10-second countdown: one short tick each second, longer distinct finish sound remains at 0.
- let lastTickSecond=null;
- function countdownTick(){
-   let sec=null;
-   try{sec=typeof left!=="undefined"?Number(left):null}catch(e){}
-   if(sec!==null && sec>0 && sec<=10 && sec!==lastTickSecond){
-     lastTickSecond=sec;
-     try{brushTone(false)}catch(e){}
+})();
+
+// v0.14.4 hatch exit: direct pointer handler installed after reveal
+(function(){
+ function exitHatch0144(e){
+   if(e){e.preventDefault();e.stopPropagation();}
+   const hatch=document.getElementById("hatchV06");
+   const reward=document.getElementById("reward");
+   const brush=document.getElementById("brushScreen");
+   if(hatch){
+     hatch.hidden=true;
+     hatch.setAttribute("aria-hidden","true");
+     hatch.classList.remove("hatching","cracked","revealed","open");
+     hatch.style.cssText="display:none!important;pointer-events:none!important;visibility:hidden!important;";
    }
-   if(sec===0)lastTickSecond=null;
+   reward?.classList.remove("open");
+   brush?.classList.remove("open","finale");
+   document.body.classList.remove("locked");
+   document.body.removeAttribute("style");
+   document.documentElement.classList.remove("tips-open");
+   document.documentElement.style.overflow="";
+   try{finishing=false}catch(_){}
+   setTimeout(()=>{
+     try{window.refreshCollection?.()}catch(_){}
+     window.scrollTo(0,0);
+   },0);
  }
- setInterval(countdownTick,120);
+ function wire(){
+   const b=document.getElementById("hatchContinue");
+   if(!b)return;
+   b.onpointerup=exitHatch0144;
+   b.onclick=exitHatch0144;
+   b.style.pointerEvents="auto";
+   b.style.touchAction="manipulation";
+ }
+ new MutationObserver(()=>{
+   const h=document.getElementById("hatchV06");
+   if(h && !h.hidden && h.classList.contains("revealed")) wire();
+ }).observe(document.body,{subtree:true,attributes:true,attributeFilter:["class","hidden"]});
+ document.addEventListener("DOMContentLoaded",wire);
+ window.exitHatch0144=exitHatch0144;
 })();
