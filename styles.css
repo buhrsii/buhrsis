@@ -113,3 +113,7 @@ body:not(.locked){overflow:auto!important;touch-action:auto!important}
 /* v0.14.2 hatch overlay must never survive after it is hidden */
 #hatchV06[hidden]{display:none!important;pointer-events:none!important;visibility:hidden!important}
 #hatchV06:not([hidden]){pointer-events:auto!important;visibility:visible!important}
+
+/* v0.14.3: hard guarantee for hatch exit */
+#hatchV06[hidden]{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body:not(.locked) #hatchV06[hidden]{z-index:-1!important}

@@ -398,3 +398,49 @@ document.addEventListener("click",e=>{
  },true);
  window.closeHatchAndReturn=closeHatchAndReturn;
 })();
+
+// v0.14.3 hard reset of hatch continuation + countdown audio
+(function(){
+ function hardCloseHatch(){
+   const ov=document.getElementById("hatchV06");
+   document.getElementById("reward")?.classList.remove("open");
+   document.getElementById("brushScreen")?.classList.remove("open","finale");
+   if(ov){
+     ov.hidden=true;
+     ov.className="hatch-v06";
+     ov.removeAttribute("style");
+   }
+   document.body.classList.remove("locked");
+   document.body.style.overflow="";
+   document.body.style.pointerEvents="";
+   document.documentElement.style.overflow="";
+   document.documentElement.classList.remove("tips-open");
+   document.querySelectorAll(".overlay.open,.modal.open,.popup.open").forEach(x=>x.classList.remove("open"));
+   try{finishing=false}catch(e){}
+   try{window.refreshCollection?.()}catch(e){}
+   requestAnimationFrame(()=>window.scrollTo(0,0));
+ }
+ function bindHatchButton(){
+   const old=document.getElementById("hatchContinue");
+   if(!old)return;
+   const fresh=old.cloneNode(true);
+   old.replaceWith(fresh);
+   fresh.addEventListener("click",e=>{e.preventDefault();hardCloseHatch()});
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bindHatchButton);
+ else bindHatchButton();
+ window.hardCloseHatch0143=hardCloseHatch;
+
+ // Final 10-second countdown: one short tick each second, longer distinct finish sound remains at 0.
+ let lastTickSecond=null;
+ function countdownTick(){
+   let sec=null;
+   try{sec=typeof left!=="undefined"?Number(left):null}catch(e){}
+   if(sec!==null && sec>0 && sec<=10 && sec!==lastTickSecond){
+     lastTickSecond=sec;
+     try{brushTone(false)}catch(e){}
+   }
+   if(sec===0)lastTickSecond=null;
+ }
+ setInterval(countdownTick,120);
+})();
