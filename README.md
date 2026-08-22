@@ -1,12 +1,13 @@
-Buhrsi's v0.11 – echtes Schlüpfen
-- Ei kann bei 100 Energie geschlüpft werden.
-- Seltenheit wird serverseitig bestimmt: Common 68%, Rare 22%, Epic 8%, Legendary 2%.
-- Sammlerwert wird serverseitig erzeugt.
-- Geschlüpftes Buhrsi wird dauerhaft in Supabase gespeichert.
-- Ei-Energie springt nach dem Schlüpfen auf 0.
-- bestehende Reveal-Animation wird mit echten Daten gespeist.
+Buhrsi's v0.12
+Enthält v0.11 Schlüpfsystem plus zwei Mobile-Fixes:
+- Fixed Bottom Navigation reserviert jetzt echten Scroll-Abstand inkl. iPhone Home-Safe-Area.
+- Letzte Sammlungskarten können vollständig oberhalb der Menüleiste angezeigt werden.
+- Wake Lock wurde robuster an den aktiven Putz-Timer gekoppelt.
+- Wake Lock wird nach Rückkehr aus dem Hintergrund erneut angefordert.
+- Nach Abschluss/Abbruch wird Wake Lock freigegeben.
 
-Einmalig `supabase-v011.sql` im Supabase SQL Editor ausführen.
-Danach alle Dateien ins bestehende GitHub-Repo hochladen und main committen.
+Wenn v0.11 noch NICHT installiert wurde:
+1. zuerst `supabase-v011.sql` aus dieser ZIP in Supabase ausführen,
+2. danach v0.12 Dateien in GitHub hochladen und main committen.
 
-Hinweis: Kinder-PIN-Sessions werden vor öffentlichem Betrieb noch auf serverseitige signierte Sessions gehärtet.
+Wenn `supabase-v011.sql` bereits erfolgreich ausgeführt wurde, ist kein weiterer SQL-Schritt nötig.

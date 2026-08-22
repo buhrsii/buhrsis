@@ -203,3 +203,57 @@ document.addEventListener("DOMContentLoaded",()=>{
    window.refreshCollection?.();
  });
 })();
+
+// v0.12 robust screen wake lock for active brushing timer
+(function(){
+ let lock=null,active=false,lastSeconds=null;
+ async function acquire(){
+   if(!active||document.visibilityState!=="visible"||!("wakeLock" in navigator))return;
+   try{
+     if(lock && !lock.released)return;
+     lock=await navigator.wakeLock.request("screen");
+     lock.addEventListener("release",()=>{lock=null});
+   }catch(e){console.info("Screen Wake Lock:",e.message)}
+ }
+ async function release(){
+   try{if(lock&&!lock.released)await lock.release()}catch(e){}
+   lock=null;
+ }
+ function parseTimer(){
+   const nodes=[...document.querySelectorAll("body *")].filter(el=>el.children.length===0);
+   for(const el of nodes){
+     const t=(el.textContent||"").trim();
+     const m=t.match(/^([0-2]?):?([0-5]?\d):([0-5]\d)$/)||t.match(/^([0-5]?\d):([0-5]\d)$/);
+     if(m){
+       let sec;
+       if(m.length===4)sec=(+m[1]||0)*3600+(+m[2])*60+(+m[3]);
+       else sec=(+m[1])*60+(+m[2]);
+       if(sec>=0&&sec<=180)return sec;
+     }
+   }
+   return null;
+ }
+ function inspect(){
+   const sec=parseTimer();
+   if(sec!==null){
+     if(lastSeconds!==null && sec<lastSeconds && sec>0){active=true;acquire()}
+     if(sec===0 && active){active=false;release()}
+     lastSeconds=sec;
+   }
+ }
+ // User gesture: if a control starts the brushing flow, request immediately.
+ document.addEventListener("pointerup",e=>{
+   const ctl=e.target.closest("button,[role=button],a");
+   if(!ctl)return;
+   const text=(ctl.textContent||"").toLowerCase();
+   if(text.includes("putzen")||text.includes("start")){
+     active=true;acquire();setTimeout(inspect,250);
+   }
+ },true);
+ window.addEventListener("buhrsi:brush-start",()=>{active=true;acquire()});
+ window.addEventListener("buhrsi:brush-complete",()=>{active=false;release()});
+ window.addEventListener("buhrsi:brush-cancel",()=>{active=false;release()});
+ document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&active)acquire()});
+ new MutationObserver(inspect).observe(document.body,{subtree:true,childList:true,characterData:true});
+ setInterval(inspect,1000);
+})();
