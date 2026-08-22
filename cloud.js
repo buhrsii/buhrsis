@@ -43,3 +43,18 @@ window.BuhrsiAdmin={
  async resetPin(id,pin){const {error}=await sb.rpc("reset_child_pin",{p_child:id,p_pin:pin});return {ok:!error,error}},
  async reload(){await profiles()}
 };
+
+window.BuhrsiHatch={
+ async hatch(){
+   if(!sb||!child||childModeSession)return {ok:false,reason:"child-session"};
+   const {data,error}=await sb.rpc("hatch_ready_egg",{p_child:child.id});
+   if(error){console.error(error);return {ok:false,error}}
+   child.egg_energy=0;return {ok:true,data};
+ },
+ async collection(){
+   if(!sb||!child||childModeSession)return [];
+   const {data,error}=await sb.from("buhrsis").select("*").eq("child_id",child.id).order("born_at",{ascending:false});
+   return error?[]:(data||[]);
+ },
+ profile(){return child}
+};

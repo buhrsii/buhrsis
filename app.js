@@ -175,3 +175,31 @@ document.addEventListener("DOMContentLoaded",()=>{
  document.getElementById("resetProgress010")?.addEventListener("click",async()=>{if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;let r=await window.BuhrsiAdmin.resetProgress(selected.id);msg.textContent=r.ok?"Spielstand wurde zurückgesetzt.":"Zurücksetzen fehlgeschlagen."});
  document.getElementById("deleteChild010")?.addEventListener("click",async()=>{if(!selected||!confirm("Kinderkonto wirklich vollständig löschen? Dieser Schritt kann nicht rückgängig gemacht werden."))return;let r=await window.BuhrsiAdmin.deleteChild(selected.id);if(r.ok){close();await window.BuhrsiAdmin.reload()}else msg.textContent="Löschen fehlgeschlagen."});
 })();
+
+// v0.11 real persistent hatch trigger
+(function(){
+ const btn=document.getElementById("hatchNow011");
+ function rarityLabel(r){return ({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR"})[r]||r}
+ function update(){
+   const p=window.BuhrsiHatch?.profile?.();
+   if(btn)btn.hidden=!p || Number(p.egg_energy||0)<100;
+ }
+ setInterval(update,1200);
+ btn?.addEventListener("click",async()=>{
+   btn.disabled=true;btn.textContent="DAS EI BRICHT AUF …";
+   const r=await window.BuhrsiHatch?.hatch?.();
+   if(!r?.ok){btn.disabled=false;btn.textContent="EI SCHLÜPFEN LASSEN";return}
+   const b=r.data,ov=document.getElementById("hatchV06");
+   if(ov){
+     ov.hidden=false;ov.classList.add("hatching");
+     setTimeout(()=>ov.classList.add("cracked"),800);
+     setTimeout(()=>{
+       ov.classList.add("revealed");
+       ov.querySelector(".hatch-rarity").textContent=rarityLabel(b.rarity);
+       ov.querySelector(".hatch-value").textContent=b.current_value+" Sammlerwert";
+     },1700);
+   }
+   btn.disabled=false;btn.textContent="EI SCHLÜPFEN LASSEN";update();
+   window.refreshCollection?.();
+ });
+})();
