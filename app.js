@@ -18,19 +18,68 @@ function render(){
  $('#week').innerHTML='';for(let i=0;i<7;i++){let d=document.createElement('i');d.className='day'+(i<Math.min(state.streak,7)?' done':'');d.textContent=i<Math.min(state.streak,7)?'✓':'';$('#week').append(d)}
 }
 function format(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function openBrush(){
- if(timer)return; left=120;lastZone=-1; $('#brushScreen').classList.add('open');document.body.classList.add('locked');
- $('#brushTime').textContent='02:00';$('#brushRing').style.setProperty('--progress','0deg');updateZone(true);
- setTimeout(runTimer,500);
+let brushEndAt=0,brushStartedAt=0,lastSignalZone=0,audioCtx=null,finishing=false;
+function initBrushAudio(){
+ try{
+   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+   if(audioCtx.state==="suspended") audioCtx.resume();
+ }catch(e){}
 }
-function runTimer(){timer=setInterval(()=>{left--;$('#brushTime').textContent=format(left);$('#brushRing').style.setProperty('--progress',((120-left)/120*360)+'deg');updateZone();if(left<=0)finish()},1000)}
+function brushTone(done=false){
+ try{
+   initBrushAudio(); if(!audioCtx)return;
+   const now=audioCtx.currentTime;
+   const notes=done?[659.25,783.99,987.77]:[783.99];
+   notes.forEach((freq,i)=>{
+     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+     o.type="sine";o.frequency.value=freq;g.gain.setValueAtTime(.0001,now+i*.12);
+     g.gain.exponentialRampToValueAtTime(.16,now+i*.12+.015);
+     g.gain.exponentialRampToValueAtTime(.0001,now+i*.12+.13);
+     o.connect(g);g.connect(audioCtx.destination);o.start(now+i*.12);o.stop(now+i*.12+.15);
+   });
+ }catch(e){}
+}
+function brushVibrate(done=false){
+ try{if(navigator.vibrate)navigator.vibrate(done?[120,70,120]:[90])}catch(e){}
+}
+function openBrush(){
+ if(timer)return;
+ initBrushAudio(); left=120;lastZone=-1;lastSignalZone=0;finishing=false;
+ brushStartedAt=Date.now();brushEndAt=brushStartedAt+120000;
+ sessionStorage.setItem("buhrsiBrushEndAt",String(brushEndAt));
+ $('#brushScreen').classList.add('open');document.body.classList.add('locked');
+ $('#brushTime').textContent='02:00';$('#brushRing').style.setProperty('--progress','0deg');updateZone(true);
+ window.dispatchEvent(new Event("buhrsi:brush-start"));
+ setTimeout(runTimer,250);
+}
+function runTimer(){
+ if(timer)clearInterval(timer);
+ const tick=()=>{
+   if(!brushEndAt)brushEndAt=Number(sessionStorage.getItem("buhrsiBrushEndAt")||0);
+   const remaining=Math.max(0,Math.ceil((brushEndAt-Date.now())/1000));
+   left=remaining;
+   $('#brushTime').textContent=format(left);
+   $('#brushRing').style.setProperty('--progress',((120-left)/120*360)+'deg');
+   updateZone();
+   if(left<=0)finish();
+ };
+ tick();timer=setInterval(tick,250);
+}
 function updateZone(force=false){
- const elapsed=120-left;const zi=Math.min(3,Math.floor(elapsed/30));
- if(force||zi!==lastZone){lastZone=zi;$('#brushZone').textContent=zones[zi][0];$('#brushHint').textContent=zones[zi][1];$('#brushCreature').classList.remove('react');void $('#brushCreature').offsetWidth;$('#brushCreature').classList.add('react')}
+ const elapsed=Math.min(120,Math.max(0,120-left)),zi=Math.min(3,Math.floor(elapsed/30));
+ if(force||zi!==lastZone){
+   const previous=lastZone;lastZone=zi;
+   $('#brushZone').textContent=zones[zi][0];$('#brushHint').textContent=zones[zi][1];
+   $('#brushCreature').classList.remove('react');void $('#brushCreature').offsetWidth;$('#brushCreature').classList.add('react');
+   if(!force && zi>previous && zi>lastSignalZone){lastSignalZone=zi;brushTone(false);brushVibrate(false)}
+ }
  if(left<=10&&left>0){$('#brushZone').textContent='ENDSPURT';$('#brushHint').textContent=left+' …';$('#brushScreen').classList.add('finale')}else $('#brushScreen').classList.remove('finale');
 }
 function finish(){
- clearInterval(timer);timer=null;$('#brushScreen').classList.remove('open','finale');
+ if(finishing)return;finishing=true;
+ clearInterval(timer);timer=null;brushEndAt=0;sessionStorage.removeItem("buhrsiBrushEndAt");
+ brushTone(true);brushVibrate(true);window.dispatchEvent(new Event("buhrsi:brush-complete"));
+ $('#brushScreen').classList.remove('open','finale');
  const oldLevel=Math.floor(state.xp/200)+1;state.xp+=20;state.glanz=Math.min(100,state.glanz+3);state.eggEnergy=Math.min(200,(state.eggEnergy||0)+20);
  const today=new Date().toISOString().slice(0,10);if(state.lastBrush!==today){state.streak+=1;state.lastBrush=today}
  const newLevel=Math.floor(state.xp/200)+1;save();render();
@@ -257,3 +306,17 @@ document.addEventListener("DOMContentLoaded",()=>{
  new MutationObserver(inspect).observe(document.body,{subtree:true,childList:true,characterData:true});
  setInterval(inspect,1000);
 })();
+
+// v0.13: when iOS resumes the page, recalculate from the absolute end timestamp.
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible" && sessionStorage.getItem("buhrsiBrushEndAt")){
+   brushEndAt=Number(sessionStorage.getItem("buhrsiBrushEndAt"));
+   if(!timer)runTimer();
+ }
+});
+window.addEventListener("pageshow",()=>{
+ if(sessionStorage.getItem("buhrsiBrushEndAt")){
+   brushEndAt=Number(sessionStorage.getItem("buhrsiBrushEndAt"));
+   if(Date.now()>=brushEndAt)finish(); else if(!timer)runTimer();
+ }
+});
