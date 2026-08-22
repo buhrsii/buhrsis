@@ -567,3 +567,42 @@ window.addEventListener("load",()=>{
  window.addEventListener("load",()=>setTimeout(unlockParentUI,400));
  window.unlockParentUI0151=unlockParentUI;
 })();
+
+// v0.15.2: remove parent-area dead end
+(function(){
+ async function resolveAndOpenCard(card){
+   if(!sb)return;
+   const username=(card.textContent.match(/@([a-zA-Z0-9._-]+)/)||[])[1]||"";
+   const name=(card.querySelector("b,strong")?.textContent||card.firstElementChild?.textContent||"").trim();
+   let q=sb.from("child_profiles").select("*");
+   if(username)q=q.eq("username",username);
+   else if(name)q=q.eq("name",name);
+   const {data,error}=await q.limit(1).maybeSingle();
+   if(!error&&data)window.parentOpenChild0152?.(data);
+ }
+ function wireParentCards(){
+   const parent=document.querySelector("#parentScreen,.parent-screen,#parentArea,.parent-area,[data-screen='parent']");
+   if(!parent)return;
+   const cards=[...parent.querySelectorAll(".profile-card,.child-card,[data-child-id]")];
+   // Fallback for current UI: direct children above the create form that contain @username.
+   if(!cards.length){
+     parent.querySelectorAll("div").forEach(x=>{
+       if(x.children.length<=4 && /@[a-zA-Z0-9._-]+/.test(x.textContent||"") && !x.querySelector("input")) cards.push(x);
+     });
+   }
+   [...new Set(cards)].forEach(card=>{
+     if(card.dataset.nav0152)return;
+     card.dataset.nav0152="1";
+     card.setAttribute("role","button");
+     card.setAttribute("tabindex","0");
+     card.style.cursor="pointer";
+     card.style.pointerEvents="auto";
+     card.addEventListener("click",()=>resolveAndOpenCard(card));
+     card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();resolveAndOpenCard(card)}});
+   });
+ }
+ const obs=new MutationObserver(()=>wireParentCards());
+ obs.observe(document.body,{subtree:true,childList:true,attributes:true});
+ window.addEventListener("load",()=>setTimeout(wireParentCards,500));
+ window.wireParentCards0152=wireParentCards;
+})();

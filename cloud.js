@@ -130,3 +130,20 @@ window.BuhrsiLeaderboard={
    return data||[];
  }
 };
+
+// v0.15.2 parent navigation
+window.parentOpenChild0152=function(profile){
+  if(!profile)return;
+  child=profile;
+  childModeSession=false;
+  try{
+    localStorage.setItem("buhrsiChild",JSON.stringify(profile));
+    localStorage.setItem("buhrsiChildMode","0");
+    window.BuhrsiDeviceSession?.saveChild?.(profile);
+  }catch(e){}
+  try{$("#profileName").textContent=profile.name}catch(e){}
+  document.body.classList.remove("locked");
+  document.querySelectorAll(".overlay.open,.modal.open,.popup.open").forEach(x=>x.classList.remove("open"));
+  try{app(true)}catch(e){try{showApp?.()}catch(_){}}
+  try{render?.()}catch(e){}
+};

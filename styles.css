@@ -135,3 +135,8 @@ body:not(.locked) #hatchV06[hidden]{z-index:-1!important}
 /* v0.15.1 parent controls must stay interactive */
 #parentScreen,.parent-screen,#parentArea,.parent-area,[data-screen="parent"]{pointer-events:auto!important}
 #parentScreen button,.parent-screen button,#parentArea button,.parent-area button,[data-screen="parent"] button{pointer-events:auto!important;touch-action:manipulation!important}
+
+/* v0.15.2 parent child profiles are actual navigation controls */
+.profile-card[data-nav0152="1"],.child-card[data-nav0152="1"],[data-child-id][data-nav0152="1"]{
+  cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important
+}

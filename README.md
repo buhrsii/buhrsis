@@ -1,9 +1,14 @@
-Buhrsi's v0.15.1 – Elternbereich Interaktions-Fix
-- Entfernt den zu aggressiven v0.15.0-Auto-Weiter-Hook, der den Elternbereich beeinflussen konnte.
-- Elternbereich entfernt geerbte body/pointer/scroll Locks.
-- Reward-, Brush- und Hatch-Overlays werden im sichtbaren Elternbereich geschlossen.
-- Buttons und Formulare im Elternbereich werden explizit wieder interaktiv.
-- Rangliste, persistenter Kinderlogin und 45-Sekunden-Testmodus bleiben erhalten.
+Buhrsi's v0.15.2 – Elternbereich Sackgasse behoben
+- Vorhandene Kinderkarten im Elternbereich sind jetzt auswählbar.
+- Antippen eines Kindes öffnet dessen Buhrsi-/Zahnputz-Hauptseite.
+- Ausgewähltes Kind wird als zuletzt verwendetes Profil auf dem Gerät gespeichert.
+- Parent-/Overlay-Locks werden beim Wechsel entfernt.
+- Tastaturbedienung Enter/Space für Kinderkarten ergänzt.
+- Bestehender 45-Sekunden-Testmodus, Sounds, Rangliste und persistenter Login bleiben erhalten.
 - Keine Supabase-Änderung.
 
-GitHub: alle Dateien ersetzen, main committen. Danach App vollständig schließen und neu öffnen.
+GitHub:
+Alle Dateien ersetzen, main committen, iPhone-App vollständig schließen und neu öffnen.
+
+Test:
+Elternbereich -> Emil/Anton antippen -> jeweilige Hauptseite muss direkt erscheinen und bedienbar sein.
