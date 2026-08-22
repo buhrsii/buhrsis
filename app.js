@@ -75,3 +75,55 @@ render();
   setInterval(renderEgg,1500);
   setTimeout(renderEgg,500);
 })();
+
+// v0.6 Wake Lock + hatch reveal
+(function(){
+ let wakeLock=null, brushing=false;
+ async function requestWake(){
+   if(!("wakeLock" in navigator)) return;
+   try{ wakeLock=await navigator.wakeLock.request("screen"); }
+   catch(e){ console.info("Wake Lock nicht verfügbar:",e.message); }
+ }
+ async function releaseWake(){
+   try{ if(wakeLock) await wakeLock.release(); }catch(e){}
+   wakeLock=null;
+ }
+ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&brushing) requestWake(); });
+ document.addEventListener("click",e=>{
+   if(e.target.closest("#startBtn,.start-button,[data-action='start'],button") && /putzen starten/i.test(e.target.closest("button")?.textContent||"")){
+     brushing=true; requestWake();
+   }
+   if(e.target.closest(".reward-close,.reward-continue,[data-action='continue']")){ brushing=false; releaseWake(); setTimeout(checkHatch,250); }
+ });
+ window.addEventListener("buhrsi:brush-complete",()=>{ brushing=false; releaseWake(); setTimeout(checkHatch,250); });
+
+ function state(){
+   try{return JSON.parse(localStorage.getItem("buhrsiState")||localStorage.getItem("buhrsis-state")||"{}")}catch(e){return{}}
+ }
+ function rarity(){
+   const r=Math.random()*100;
+   if(r<2)return ["LEGENDÄR",1800];
+   if(r<10)return ["EPISCH",950];
+   if(r<32)return ["SELTEN",520];
+   return ["GEWÖHNLICH",240];
+ }
+ function checkHatch(){
+   const s=state(), energy=Number(s.eggEnergy??s.egg_energy)||0;
+   if(energy<100 || s.lastHatchAt) return;
+   showHatch();
+ }
+ function showHatch(){
+   const ov=document.getElementById("hatchV06"); if(!ov)return;
+   ov.hidden=false; ov.classList.add("hatching");
+   setTimeout(()=>ov.classList.add("cracked"),900);
+   setTimeout(()=>{
+     const [rar,base]=rarity(), value=base+Math.floor(Math.random()*180);
+     ov.classList.add("revealed");
+     ov.querySelector(".hatch-rarity").textContent=rar;
+     ov.querySelector(".hatch-value").textContent=value+" Sammlerwert";
+   },1900);
+ }
+ document.getElementById("hatchContinue")?.addEventListener("click",()=>{
+   const ov=document.getElementById("hatchV06"); ov.hidden=true; ov.className="hatch-v06";
+ });
+})();

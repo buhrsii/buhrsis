@@ -1,7 +1,8 @@
-Buhrsi's v0.5
-- Cloud-Schema für Putzsessions
-- Cloud-Sync-Adapter für XP, Glanz, Streak und Ei-Energie
-- Ei-Fortschrittskarte mit 5 visuellen Zuständen
+Buhrsi's v0.6
+- Screen Wake Lock während des Putzens
+- erneuter Wake Lock nach Rückkehr in die App
+- Freigabe nach Abschluss
+- erste Schlüpfsequenz
+- Seltenheits-Reveal und Sammlerwert-Prototyp
 
-Einmalig: `supabase-v05.sql` im Supabase SQL Editor ausführen.
-Danach alle Dateien ins bestehende GitHub-Repo hochladen und committen. Vercel deployt automatisch.
+Für v0.6 ist keine neue SQL-Migration nötig. Dateien ins bestehende GitHub-Repo hochladen und auf main committen. Vercel aktualisiert automatisch.
