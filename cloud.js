@@ -11,7 +11,7 @@ $("#childLoginForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error
 $("#authForm").onsubmit=async e=>{e.preventDefault();msg();let email=$("#email").value.trim(),password=$("#password").value,mode=e.submitter.dataset.mode;if(mode==="signup"){let {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(error)return msg(error.message);return msg("Konto erstellt. Bitte E-Mail bestätigen.")}let {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg("Anmeldung fehlgeschlagen: "+error.message);user=data.user;await profiles()};
 $("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("create_child_account",{p_name:$("#childName").value.trim(),p_username:$("#childUsername").value.trim(),p_pin:$("#childPin").value});if(error)return msg(error.message);$("#childForm").reset();await profiles()};
 $("#logoutBtn").onclick=async()=>{sessionStorage.removeItem("buhrsiChild");child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView")};
-try{let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=m.createClient(SUPABASE_URL,SUPABASE_KEY);let saved=sessionStorage.getItem("buhrsiChild");if(saved)choose(JSON.parse(saved),true);else{let {data}=await sb.auth.getSession();user=data.session?.user||null;if(user)await profiles();else{app(false);show("roleView")}}}catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
+try{let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});let saved=sessionStorage.getItem("buhrsiChild");if(saved)choose(JSON.parse(saved),true);else{let {data}=await sb.auth.getSession();user=data.session?.user||null;if(user)await profiles();else{app(false);show("roleView")}}}catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
 window.BuhrsiCloud={get child(){return child},async saveProgress(p){if(!sb||!child||childModeSession)return {ok:false};let {data,error}=await sb.from("child_profiles").update({xp:+p.xp||0,gloss:Math.max(0,Math.min(100,+p.gloss||0)),streak:+p.streak||0,egg_energy:+p.eggEnergy||0}).eq("id",child.id).select().single();if(!error)child=data;return {ok:!error,data,error}},async logBrush(){}};
 
 window.BuhrsiCollection={
@@ -70,4 +70,42 @@ window.BuhrsiEvolution={
    const {error}=await sb.rpc("feed_buhrsi_brush_xp",{p_child:child.id});
    return !error;
  }
+};
+
+// v0.14.7 persistent device session
+window.BuhrsiDeviceSession={
+ saveChild(p){
+   try{
+     localStorage.setItem("buhrsis:lastChildId",p?.id||"");
+     localStorage.setItem("buhrsis:lastChildName",p?.name||"");
+   }catch(e){}
+ },
+ clearChild(){
+   try{
+     localStorage.removeItem("buhrsis:lastChildId");
+     localStorage.removeItem("buhrsis:lastChildName");
+   }catch(e){}
+ },
+ lastChildId(){
+   try{return localStorage.getItem("buhrsis:lastChildId")||""}catch(e){return ""}
+ }
+};
+
+window.restoreLastBuhrsiChild=async function(){
+ try{
+   if(!sb)return false;
+   const {data:{session}}=await sb.auth.getSession();
+   if(!session)return false;
+   const id=window.BuhrsiDeviceSession?.lastChildId?.();
+   if(!id)return false;
+   const {data,error}=await sb.from("child_profiles").select("*").eq("id",id).eq("parent_id",session.user.id).maybeSingle();
+   if(error||!data)return false;
+   child=data;
+   childModeSession=false;
+   window.BuhrsiDeviceSession.saveChild(data);
+   try{showApp?.()}catch(e){}
+   try{render?.()}catch(e){}
+   try{window.renderStreak091?.(data)}catch(e){}
+   return true;
+ }catch(e){console.error("restore child",e);return false}
 };

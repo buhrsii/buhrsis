@@ -476,3 +476,14 @@ document.addEventListener("click",e=>{
  document.addEventListener("DOMContentLoaded",wire);
  window.exitHatch0144=exitHatch0144;
 })();
+
+// v0.14.7 restore signed-in device session on launch
+window.addEventListener("load",()=>{
+ setTimeout(async()=>{
+   const restored=await window.restoreLastBuhrsiChild?.();
+   if(restored){
+     document.body.classList.remove("locked");
+     try{window.refreshCollection?.()}catch(e){}
+   }
+ },250);
+});
