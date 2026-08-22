@@ -1,5 +1,5 @@
-const CACHE = "buhrsis-v013";
-const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
+const CACHE = "buhrsis-v0131";
+const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));

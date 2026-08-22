@@ -25,18 +25,31 @@ function initBrushAudio(){
    if(audioCtx.state==="suspended") audioCtx.resume();
  }catch(e){}
 }
+let zoneAudio=null,finishAudio=null,audioUnlocked=false;
+function prepareBrushAudio(){
+ try{
+   zoneAudio=zoneAudio||new Audio("./assets/zone.wav");
+   finishAudio=finishAudio||new Audio("./assets/finish.wav");
+   zoneAudio.preload="auto";finishAudio.preload="auto";
+   zoneAudio.load();finishAudio.load();
+ }catch(e){}
+}
+async function unlockBrushAudio(){
+ prepareBrushAudio();
+ if(audioUnlocked)return;
+ try{
+   zoneAudio.muted=true;zoneAudio.currentTime=0;
+   await zoneAudio.play();zoneAudio.pause();zoneAudio.currentTime=0;zoneAudio.muted=false;
+   finishAudio.muted=true;finishAudio.currentTime=0;
+   await finishAudio.play();finishAudio.pause();finishAudio.currentTime=0;finishAudio.muted=false;
+   audioUnlocked=true;
+ }catch(e){console.info("Audio unlock:",e.message)}
+}
 function brushTone(done=false){
  try{
-   initBrushAudio(); if(!audioCtx)return;
-   const now=audioCtx.currentTime;
-   const notes=done?[659.25,783.99,987.77]:[783.99];
-   notes.forEach((freq,i)=>{
-     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-     o.type="sine";o.frequency.value=freq;g.gain.setValueAtTime(.0001,now+i*.12);
-     g.gain.exponentialRampToValueAtTime(.16,now+i*.12+.015);
-     g.gain.exponentialRampToValueAtTime(.0001,now+i*.12+.13);
-     o.connect(g);g.connect(audioCtx.destination);o.start(now+i*.12);o.stop(now+i*.12+.15);
-   });
+   const a=done?finishAudio:zoneAudio;if(!a)return;
+   a.pause();a.currentTime=0;a.muted=false;a.volume=1;
+   const p=a.play();if(p?.catch)p.catch(e=>console.info("Audio play:",e.message));
  }catch(e){}
 }
 function brushVibrate(done=false){
@@ -44,7 +57,7 @@ function brushVibrate(done=false){
 }
 function openBrush(){
  if(timer)return;
- initBrushAudio(); left=120;lastZone=-1;lastSignalZone=0;finishing=false;
+ initBrushAudio(); prepareBrushAudio(); unlockBrushAudio(); left=120;lastZone=-1;lastSignalZone=0;finishing=false;
  brushStartedAt=Date.now();brushEndAt=brushStartedAt+120000;
  sessionStorage.setItem("buhrsiBrushEndAt",String(brushEndAt));
  $('#brushScreen').classList.add('open');document.body.classList.add('locked');
@@ -320,3 +333,5 @@ window.addEventListener("pageshow",()=>{
    if(Date.now()>=brushEndAt)finish(); else if(!timer)runTimer();
  }
 });
+
+document.addEventListener("DOMContentLoaded",prepareBrushAudio);
