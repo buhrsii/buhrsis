@@ -146,3 +146,9 @@ body:not(.locked) #hatchV06[hidden]{z-index:-1!important}
  background:#ffc45a;color:#111;font-weight:900;font-size:12px;letter-spacing:.04em;
  pointer-events:auto!important;touch-action:manipulation!important;position:relative;z-index:20
 }
+
+.profile-choice-v154{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;padding:12px!important}
+.profile-info-v154{grid-column:1/-1;text-align:center}
+.profile-info-v154 b,.profile-info-v154 small{display:block}
+.child-start-v154,.admin-start-v154{background:#ffc45a!important;color:#111!important;border:0!important;border-radius:12px!important;padding:12px 8px!important;font-weight:900!important;pointer-events:auto!important}
+.child-admin-v154{background:#2a3030!important;color:#f2eee6!important;border:1px solid #424949!important;border-radius:12px!important;padding:12px 8px!important;font-weight:800!important;pointer-events:auto!important}

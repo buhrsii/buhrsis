@@ -618,3 +618,20 @@ window.addEventListener("load",()=>{
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
  setTimeout(attach,500);setTimeout(attach,1500);
 })();
+
+// v0.15.4 parent admin: explicit child start from modal
+(function(){
+ const b=document.getElementById("startChildAdmin0154");
+ if(!b)return;
+ b.addEventListener("click",()=>{
+   const modal=document.getElementById("parentAdmin010");
+   const username=(document.getElementById("adminMeta010")?.textContent.match(/@([a-zA-Z0-9._-]+)/)||[])[1];
+   if(!username||!sb)return;
+   sb.from("child_profiles").select("*").eq("username",username).limit(1).maybeSingle().then(({data})=>{
+     if(!data)return;
+     modal.hidden=true;
+     if(typeof choose==="function")choose(data,false);
+     else window.parentOpenChild0152?.(data);
+   });
+ });
+})();

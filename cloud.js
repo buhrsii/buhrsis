@@ -11,7 +11,21 @@ function choose(p,isChild=false){
  }catch(e){}
  app(true)
 }
-async function profiles(){let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");if(error)return msg(error.message);show("profileView");$("#profileList").innerHTML="";(data||[]).forEach(p=>{let b=document.createElement("button");b.className="profile-choice";b.type="button";b.innerHTML=`<b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small>`;b.onclick=()=>window.openParentAdmin010?window.openParentAdmin010(p):choose(p);$("#profileList").append(b)})}
+async function profiles(){
+ let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");
+ if(error)return msg(error.message);
+ show("profileView");
+ const list=$("#profileList");list.innerHTML="";
+ (data||[]).forEach(p=>{
+   const card=document.createElement("div");card.className="profile-choice profile-choice-v154";
+   card.innerHTML=`<div class="profile-info-v154"><b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small></div>`;
+   const start=document.createElement("button");start.type="button";start.className="child-start-v154";start.textContent="ALS KIND STARTEN";
+   start.onclick=e=>{e.preventDefault();e.stopPropagation();choose(p,false)};
+   const admin=document.createElement("button");admin.type="button";admin.className="child-admin-v154";admin.textContent="VERWALTEN";
+   admin.onclick=e=>{e.preventDefault();e.stopPropagation();window.openParentAdmin010?.(p)};
+   card.append(start,admin);list.append(card);
+ });
+}
 $("#childMode").onclick=()=>{msg();show("childLoginView")}; $("#parentMode").onclick=()=>{msg();show("authView")};
 document.querySelectorAll(".back-auth").forEach(b=>b.onclick=()=>{msg();show("roleView")});
 $("#childLoginForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("verify_child_pin",{p_username:$("#childUsernameLogin").value.trim(),p_pin:$("#childPinLogin").value});if(error)return msg(error.message);if(!data?.length)return msg("Name oder PIN stimmt nicht.");choose(data[0],true)};

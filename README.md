@@ -1,15 +1,15 @@
-Buhrsi's v0.15.3 – Elternbereich explizite Navigation
+Buhrsi's v0.15.4 – Elternnavigation direkt im Quellcode repariert
 
-v0.15.2 war zu indirekt: Es versuchte bestehende Profilkarten über generische Selektoren klickbar zu machen.
-v0.15.3 hängt stattdessen direkt an die tatsächliche Elternliste `#parentList` unter jedes Kinderprofil einen sichtbaren Button:
+Ursache:
+Die bisherigen Builds zielten auf falsche DOM-IDs/Container (`parentList`, generische Karten).
+Die echte Kinderliste heißt `profileList`. Außerdem öffnete ein Klick auf ein Kind bisher ausschließlich das Verwaltungsmodal.
 
-ALS KIND STARTEN
-
-Der Button:
-- ermittelt das konkrete Profil über dessen @Benutzername
-- setzt dieses Profil als aktives Kind
-- speichert es als letztes Geräteprofil
-- verlässt den Elternbereich und öffnet die Zahnputz-Hauptseite
+Jetzt direkt in `profiles()` repariert:
+- Jedes Kinderprofil zeigt sichtbar `ALS KIND STARTEN`
+- daneben `VERWALTEN`
+- `ALS KIND STARTEN` ruft direkt die vorhandene `choose()`-Funktion auf
+- `VERWALTEN` öffnet die bestehende Elternverwaltung
+- auch im Verwaltungsmodal gibt es `ALS KIND STARTEN`
+- nach neuem Kinderkonto wird die echte Liste neu geladen und diese Buttons sind sofort vorhanden
 
 Keine Supabase-Änderung.
-45-Sekunden-Testmodus und bestehende Sounds bleiben unverändert.
