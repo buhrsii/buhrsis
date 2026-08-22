@@ -1,4 +1,4 @@
-const CACHE = "buhrsis-v082";
+const CACHE = "buhrsis-v091";
 const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install", event => {

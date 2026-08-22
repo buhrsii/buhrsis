@@ -146,3 +146,21 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(t.includes("zahnputz")&&t.includes("tipp")) el.remove();
   });
 });
+
+// v0.9.1 daily + perfect streak display
+(function(){
+ function render(p,n=0,perfect=false){
+  if(!p)return;
+  const d=document.getElementById("dailyStreak091"),ps=document.getElementById("perfectStreak091"),s=document.getElementById("todayStatus091");
+  if(d)d.textContent=(p.streak||0)+" Tage"; if(ps)ps.textContent=(p.perfect_streak||0)+" Tage";
+  document.getElementById("brushDot1")?.classList.toggle("done",n>=1);
+  document.getElementById("brushDot2")?.classList.toggle("done",n>=2);
+  if(s)s.textContent=perfect?"⭐ Perfekter Tag!":n>=1?"🔥 Serie gesichert · abends noch einmal":"Noch nicht geputzt";
+ }
+ window.renderStreak091=render;
+ setInterval(()=>render(window.BuhrsiStreaks?.profile?.()),1800);
+ window.addEventListener("buhrsi:brush-complete",async()=>{
+   const r=await window.BuhrsiStreaks?.complete?.(120);
+   if(r?.ok)render(r.profile,r.brushes_today,r.perfect_day);
+ });
+})();

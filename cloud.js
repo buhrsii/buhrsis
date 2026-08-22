@@ -26,3 +26,13 @@ window.BuhrsiCollection={
    if(error){console.error(error);return null} child.egg_energy=0; return data;
  }
 };
+
+window.BuhrsiStreaks={
+ async complete(duration=120){
+   if(!sb||!child||childModeSession)return {ok:false,reason:"child-session"};
+   const {data,error}=await sb.rpc("complete_brushing_v091",{p_child:child.id,p_duration:duration});
+   if(error){console.error(error);return {ok:false,error}}
+   child=data.profile;return {ok:true,...data}
+ },
+ profile(){return child}
+};
