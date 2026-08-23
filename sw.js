@@ -1,5 +1,5 @@
-const CACHE = "buhrsis-v020-parent-admin";
-const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
+const CACHE = "buhrsis-v021-moxu-icon";
+const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-moxu-192.png","./icon-moxu-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
