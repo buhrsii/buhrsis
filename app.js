@@ -386,6 +386,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  document.getElementById("resetPin010")?.addEventListener("click",async()=>{if(!selected)return;let pin=prompt("Neue 4-stellige PIN:");if(!/^\d{4}$/.test(pin||""))return msg.textContent="Bitte genau 4 Ziffern eingeben.";let r=await window.BuhrsiAdmin.resetPin(selected.id,pin);msg.textContent=r.ok?"PIN wurde geändert.":"PIN konnte nicht geändert werden."});
  document.getElementById("resetProgress010")?.addEventListener("click",async()=>{if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;let r=await window.BuhrsiAdmin.resetProgress(selected.id);msg.textContent=r.ok?"Spielstand wurde zurückgesetzt.":"Zurücksetzen fehlgeschlagen."});
  document.getElementById("deleteChild010")?.addEventListener("click",async()=>{if(!selected||!confirm("Kinderkonto wirklich vollständig löschen? Dieser Schritt kann nicht rückgängig gemacht werden."))return;let r=await window.BuhrsiAdmin.deleteChild(selected.id);if(r.ok){close();await window.BuhrsiAdmin.reload()}else msg.textContent="Löschen fehlgeschlagen."});
+ document.getElementById("startChildAdmin0154")?.addEventListener("click",()=>{if(!selected)return;const profile=selected;close();window.parentOpenChild0152?.(profile)});
 })();
 
 // v0.11 real persistent hatch trigger
@@ -716,23 +717,6 @@ window.addEventListener("load",()=>{
  };
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
  setTimeout(attach,500);setTimeout(attach,1500);
-})();
-
-// v0.15.4 parent admin: explicit child start from modal
-(function(){
- const b=document.getElementById("startChildAdmin0154");
- if(!b)return;
- b.addEventListener("click",()=>{
-   const modal=document.getElementById("parentAdmin010");
-   const username=(document.getElementById("adminMeta010")?.textContent.match(/@([a-zA-Z0-9._-]+)/)||[])[1];
-   if(!username||!sb)return;
-   sb.from("child_profiles").select("*").eq("username",username).limit(1).maybeSingle().then(({data})=>{
-     if(!data)return;
-     modal.hidden=true;
-     if(typeof choose==="function")choose(data,false);
-     else window.parentOpenChild0152?.(data);
-   });
- });
 })();
 
 // v0.17 functional bottom navigation
