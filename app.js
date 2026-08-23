@@ -581,15 +581,32 @@ window.addEventListener("load",()=>{
    const rows=await window.BuhrsiLeaderboard?.load?.()||[];
    box.innerHTML="";
    if(!rows.length){box.innerHTML="<p>Noch keine Ranglistendaten.</p>";return}
-   rows.slice(0,20).forEach((r,i)=>{
+   const uniqueByName=new Map();
+   rows.forEach((row,sourceIndex)=>{
+     const displayName=String(row.display_name||"").trim();
+     if(!displayName)return;
+     const key=displayName.toLocaleLowerCase("de");
+     const previous=uniqueByName.get(key);
+     if(!previous){
+       uniqueByName.set(key,{...row,display_name:displayName,_sourceIndex:sourceIndex});
+       return;
+     }
+     previous.xp=Math.max(Number(previous.xp)||0,Number(row.xp)||0);
+     previous.streak=Math.max(Number(previous.streak)||0,Number(row.streak)||0);
+     previous.is_me=Boolean(previous.is_me||row.is_me);
+   });
+   const ranked=[...uniqueByName.values()].sort((a,b)=>(Number(b.xp)||0)-(Number(a.xp)||0)||a._sourceIndex-b._sourceIndex);
+   ranked.slice(0,20).forEach((r,i)=>{
      const el=document.createElement("div");el.className="leader-row0149"+(r.is_me?" me":"");
-     const medal=r.rank==1?"🥇":r.rank==2?"🥈":r.rank==3?"🥉":"#"+r.rank;
+     const rank=i+1;
+     const medal=rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"#"+rank;
      el.innerHTML=`<b>${medal}</b><span><strong>${r.display_name}</strong><small>🔥 ${r.streak||0} Tage</small></span><em>${r.xp||0} XP</em>`;
      box.append(el);
    });
  }
  window.refreshLeaderboard=loadBoard;
  setTimeout(loadBoard,1200);
+ window.addEventListener("buhrsi:child-change",()=>setTimeout(loadBoard,100));
  window.addEventListener("buhrsi:brush-complete",()=>setTimeout(loadBoard,700));
 })();
 

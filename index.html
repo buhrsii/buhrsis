@@ -16,6 +16,7 @@
 <p id="cloudMessage" class="cloud-message"></p></div></section><main class="app">
 <header class="top"><div class="profile"><div class="avatar">B</div><b id="profileName">Buhrsi’s</b></div><div class="currencies"><span>⭐ <b id="xpTop">120</b> XP</span><span>✨ <b id="glanzHome">68</b></span></div><button id="logoutBtn" class="logout-btn" type="button">Abmelden</button></header>
 <section class="hero card" id="homeSection"><div class="hero-copy"><p class="eyebrow">LOS GEHT'S! ✦</p><h1>Putze deine Zähne</h1><div class="timer" id="timer"><span id="time">02:00</span><small id="zone">Bereit?</small></div></div><div class="creature-wrap"><img class="home-buhrsi-image" id="creature" src="assets/buhrsis/moxu.png" alt="Moxu" decoding="async" fetchpriority="high"><button class="primary" id="start">🪥 PUTZEN STARTEN</button></div></section>
+<section class="leaderboard0149 leaderboard-home" id="leaderboard0149"><div class="leader-head0149"><div><span class="eyebrow">RANGLISTE</span><h2>Wer putzt am fleißigsten?</h2></div><span>XP</span></div><div id="leaderList0149" class="leader-list0149"><p>Rangliste wird geladen …</p></div><p class="leader-note0149">Mehr XP bedeutet mehr abgeschlossene Putzrunden.</p></section>
 <section class="grid" id="statsSection"><article class="card stat"><h2>⭐ LEVEL <span id="level">1</span></h2><div class="bar"><i id="xpBar"></i></div><p><span id="xpToNext">80</span> XP bis Level 2</p></article><article class="card stat"><h2>🔥 PUTZSTREAK</h2><strong><span id="streak">0</span> TAGE</strong><p>Jeder Putztag zählt.</p><div class="week" id="week"></div></article></section>
 <section class="card egg"><div class="egg-art"><div class="egg-shape">✦</div></div><div><h2>EIN NEUES BUHRSI ENTDECKEN</h2><p>Dein Ei sammelt Energie...</p><div class="bar"><i id="eggBar"></i></div><small><span id="eggXp">0</span> / 200 XP</small></div></section>
 <section class="card collection"><div class="section-title"><h2>DEINE BUHRSI'S</h2><span>1 entdeckt</span></div><div class="creature-card"><div class="mini-creature"></div><b>Erstes Buhrsi</b><small>Lv. <span id="miniLevel">1</span></small><em>HÄUFIG</em></div></section>
@@ -42,11 +43,7 @@
 </section>
 <section id="buhrsiDetail" class="buhrsi-detail" hidden><div class="buhrsi-detail-card"><button id="closeBuhrsiDetail" type="button">×</button>
 <div id="detailVisual" class="buhrsi-visual buhrsi-detail-visual"><img id="detailImage" class="buhrsi-image" alt=""></div><span id="detailRarity" class="eyebrow"></span><h2 id="detailName">Buhrsi</h2>
-<div class="detail-stats"><div><small>Sammlerwert</small><b id="detailValue">0</b></div><div><small>Bindung</small><b id="detailBond">50</b></div><div><small>Glanz</small><b id="detailGloss">50</b></div></div></div></section><section class="leaderboard0149" id="leaderboard0149">
-<div class="leader-head0149"><div><span class="eyebrow">RANGLISTE</span><h2>Wer putzt am fleißigsten?</h2></div><span>XP</span></div>
-<div id="leaderList0149" class="leader-list0149"><p>Rangliste wird geladen …</p></div>
-<p class="leader-note0149">Mehr XP bedeutet mehr abgeschlossene Putzrunden. Es werden nur Vornamen/Profilnamen angezeigt.</p>
-</section></main><script src="app.js"></script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script><script type="module" src="cloud.js"></script><section id="hatchV06" class="hatch-v06" hidden aria-live="polite">
+<div class="detail-stats"><div><small>Sammlerwert</small><b id="detailValue">0</b></div><div><small>Bindung</small><b id="detailBond">50</b></div><div><small>Glanz</small><b id="detailGloss">50</b></div></div></div></section></main><script src="app.js"></script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script><script type="module" src="cloud.js"></script><section id="hatchV06" class="hatch-v06" hidden aria-live="polite">
  <div class="hatch-stage">
   <p class="eyebrow">ETWAS PASSIERT …</p><h2>Dein Ei schlüpft!</h2>
   <div class="hatch-visual"><div class="hatch-egg"><i></i><b></b></div>
