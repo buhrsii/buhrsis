@@ -148,7 +148,6 @@ render();
   document.addEventListener("click",e=>{
     if(e.target.closest(".reward-close,.reward-continue,[data-action='continue']")) setTimeout(sync,100);
   });
-  setInterval(renderEgg,1500);
   setTimeout(renderEgg,500);
 })();
 
@@ -238,6 +237,7 @@ render();
  const detailVisual=document.getElementById("detailVisual");
  const detailImage=document.getElementById("detailImage");
  const byVariant=new Map(BUHRSI_CATALOG.map(entry=>[entry.variant,entry]));
+ const availableAssets=new Set(["moxu","sonnenschein","flaemmchen","bluupy","rosalie","brillberto","zauberlin","herzilein","zitro","pinkadora","wellenbob","detekto","koenigchen","lavaknirp","schlumpfi","glitzerglueck","aurorix"]);
  const normalize=value=>String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
  const bySpecies=new Map(BUHRSI_CATALOG.flatMap(entry=>[entry.species,entry.legacySpecies].filter(Boolean).map(species=>[normalize(species),entry])));
  const rarityLabel=rarity=>({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR",NEUTRAL:"BEGLEITER"})[rarity]||rarity;
@@ -267,13 +267,16 @@ render();
  function createVisual(entry,isDiscovered){
   const visual=document.createElement("div");
   visual.className="buhrsi-visual "+(isDiscovered?"is-discovered":"is-silhouette");
+  if(!isDiscovered||!availableAssets.has(entry.variant)){
+   visual.classList.add("image-missing");
+   return visual;
+  }
   const img=document.createElement("img");
   img.className="buhrsi-image";
   img.src=entry.image;
   img.alt=isDiscovered?entry.species:"";
   img.loading="lazy";
   img.decoding="async";
-  if(!isDiscovered)img.setAttribute("aria-hidden","true");
   img.addEventListener("error",()=>{img.hidden=true;visual.classList.add("image-missing")},{once:true});
   visual.append(img);
   return visual;
@@ -344,10 +347,7 @@ render();
 
  renderCollection([]);
  setTimeout(window.refreshCollection,1200);
- setInterval(()=>{
-  const profileId=String(window.BuhrsiHatch?.profile?.()?.id||"");
-  if(profileId&&profileId!==activeProfileId)window.refreshCollection();
- },1500);
+ window.addEventListener("buhrsi:child-change",()=>window.refreshCollection());
 })();
 
 // v0.8.2: Zahnputz-Tipps vollständig entfernt.
@@ -369,7 +369,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(s)s.textContent=perfect?"⭐ Perfekter Tag!":n>=1?"🔥 Serie gesichert · abends noch einmal":"Noch nicht geputzt";
  }
  window.renderStreak091=render;
- setInterval(()=>render(window.BuhrsiStreaks?.profile?.()),1800);
+ setTimeout(()=>render(window.BuhrsiStreaks?.profile?.()),600);
+ window.addEventListener("buhrsi:child-change",()=>render(window.BuhrsiStreaks?.profile?.()));
  window.addEventListener("buhrsi:brush-complete",async()=>{
    const r=await window.BuhrsiStreaks?.complete?.(120);
    if(r?.ok)render(r.profile,r.brushes_today,r.perfect_day);
@@ -395,7 +396,9 @@ document.addEventListener("DOMContentLoaded",()=>{
    const p=window.BuhrsiHatch?.profile?.();
    if(btn)btn.hidden=!p || Number(p.egg_energy||0)<100;
  }
- setInterval(update,1200);
+ setTimeout(update,600);
+ window.addEventListener("buhrsi:child-change",update);
+ window.addEventListener("buhrsi:brush-complete",update);
  btn?.addEventListener("click",async()=>{
    btn.disabled=true;btn.textContent="DAS EI BRICHT AUF …";
    const r=await window.BuhrsiHatch?.hatch?.();
@@ -415,59 +418,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  });
 })();
 
-// v0.12 robust screen wake lock for active brushing timer
-(function(){
- let lock=null,active=false,lastSeconds=null;
- async function acquire(){
-   if(!active||document.visibilityState!=="visible"||!("wakeLock" in navigator))return;
-   try{
-     if(lock && !lock.released)return;
-     lock=await navigator.wakeLock.request("screen");
-     lock.addEventListener("release",()=>{lock=null});
-   }catch(e){console.info("Screen Wake Lock:",e.message)}
- }
- async function release(){
-   try{if(lock&&!lock.released)await lock.release()}catch(e){}
-   lock=null;
- }
- function parseTimer(){
-   const nodes=[...document.querySelectorAll("body *")].filter(el=>el.children.length===0);
-   for(const el of nodes){
-     const t=(el.textContent||"").trim();
-     const m=t.match(/^([0-2]?):?([0-5]?\d):([0-5]\d)$/)||t.match(/^([0-5]?\d):([0-5]\d)$/);
-     if(m){
-       let sec;
-       if(m.length===4)sec=(+m[1]||0)*3600+(+m[2])*60+(+m[3]);
-       else sec=(+m[1])*60+(+m[2]);
-       if(sec>=0&&sec<=180)return sec;
-     }
-   }
-   return null;
- }
- function inspect(){
-   const sec=parseTimer();
-   if(sec!==null){
-     if(lastSeconds!==null && sec<lastSeconds && sec>0){active=true;acquire()}
-     if(sec===0 && active){active=false;release()}
-     lastSeconds=sec;
-   }
- }
- // User gesture: if a control starts the brushing flow, request immediately.
- document.addEventListener("pointerup",e=>{
-   const ctl=e.target.closest("button,[role=button],a");
-   if(!ctl)return;
-   const text=(ctl.textContent||"").toLowerCase();
-   if(text.includes("putzen")||text.includes("start")){
-     active=true;acquire();setTimeout(inspect,250);
-   }
- },true);
- window.addEventListener("buhrsi:brush-start",()=>{active=true;acquire()});
- window.addEventListener("buhrsi:brush-complete",()=>{active=false;release()});
- window.addEventListener("buhrsi:brush-cancel",()=>{active=false;release()});
- document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&active)acquire()});
- new MutationObserver(inspect).observe(document.body,{subtree:true,childList:true,characterData:true});
- setInterval(inspect,1000);
-})();
+// v0.17: the event-driven wake lock above replaces the old DOM-scanning timer watcher.
 
 // v0.13: when iOS resumes the page, recalculate from the absolute end timestamp.
 document.addEventListener("visibilitychange",()=>{
@@ -493,7 +444,8 @@ document.addEventListener("DOMContentLoaded",prepareBrushAudio);
      const tag=document.createElement("em");tag.className="evo-tag";tag.textContent="Lebendiger Sammlerwert";card.append(tag);
    });
  }
- setInterval(decorate,1800);
+ setTimeout(decorate,1800);
+ window.addEventListener("buhrsi:child-change",()=>setTimeout(decorate,0));
  window.addEventListener("buhrsi:brush-complete",async()=>{
    await window.BuhrsiEvolution?.rewardBrush?.();
    await window.BuhrsiEvolution?.refresh?.();
@@ -607,10 +559,6 @@ document.addEventListener("click",e=>{
    b.style.pointerEvents="auto";
    b.style.touchAction="manipulation";
  }
- new MutationObserver(()=>{
-   const h=document.getElementById("hatchV06");
-   if(h && !h.hidden && h.classList.contains("revealed")) wire();
- }).observe(document.body,{subtree:true,attributes:true,attributeFilter:["class","hidden"]});
  document.addEventListener("DOMContentLoaded",wire);
  window.exitHatch0144=exitHatch0144;
 })();
@@ -698,7 +646,6 @@ window.addEventListener("load",()=>{
      x.style.pointerEvents="auto";x.style.touchAction="manipulation";
    });
  }
- new MutationObserver(unlockParentUI).observe(document.body,{subtree:true,attributes:true,attributeFilter:["class","hidden","style"]});
  document.addEventListener("click",e=>{
    if(e.target.closest("#parentScreen,.parent-screen,#parentArea,.parent-area,[data-screen='parent']")) unlockParentUI();
  },true);
@@ -739,8 +686,6 @@ window.addEventListener("load",()=>{
      card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();resolveAndOpenCard(card)}});
    });
  }
- const obs=new MutationObserver(()=>wireParentCards());
- obs.observe(document.body,{subtree:true,childList:true,attributes:true});
  window.addEventListener("load",()=>setTimeout(wireParentCards,500));
  window.wireParentCards0152=wireParentCards;
 })();
@@ -751,7 +696,6 @@ window.addEventListener("load",()=>{
  const list=()=>document.getElementById("parentList");
  const start=()=>{
    attach();
-   const el=list();if(el)new MutationObserver(attach).observe(el,{childList:true,subtree:true});
  };
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
  setTimeout(attach,500);setTimeout(attach,1500);
@@ -771,5 +715,22 @@ window.addEventListener("load",()=>{
      if(typeof choose==="function")choose(data,false);
      else window.parentOpenChild0152?.(data);
    });
+ });
+})();
+
+// v0.17 functional bottom navigation
+(function(){
+ const nav=document.querySelector("nav");
+ if(!nav)return;
+ nav.addEventListener("click",async event=>{
+  const button=event.target.closest("button");
+  if(!button||!nav.contains(button))return;
+  nav.querySelectorAll("button").forEach(item=>item.classList.toggle("active",item===button));
+  if(button.dataset.navAction==="profile"){
+   await window.BuhrsiAuth?.openChildSelector?.();
+   return;
+  }
+  const target=document.getElementById(button.dataset.navTarget||"");
+  target?.scrollIntoView({behavior:"auto",block:"start"});
  });
 })();
