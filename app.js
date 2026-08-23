@@ -201,15 +201,152 @@ render();
  
 })();
 
-// v0.8 persistent collection UI
-(async function(){
- const grid=document.getElementById("buhrsiGrid"), count=document.getElementById("collectionCount"), detail=document.getElementById("buhrsiDetail");
- function label(r){return ({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR"})[r]||r}
- function card(b){let el=document.createElement("button");el.className="buhrsi-card";el.dataset.rarity=b.rarity;el.innerHTML=`<div class="mini-toy ${b.variant}"><i></i><b></b></div><strong>${b.species}</strong><small>${label(b.rarity)}</small><span>${b.current_value} Wert</span>`;el.onclick=()=>open(b);return el}
- function open(b){document.getElementById("detailRarity").textContent=label(b.rarity);document.getElementById("detailName").textContent=b.species;document.getElementById("detailValue").textContent=b.current_value;document.getElementById("detailBond").textContent=b.bond;document.getElementById("detailGloss").textContent=b.gloss;document.getElementById("detailToy").className="mini-toy "+b.variant;detail.hidden=false}
+// v0.16 fixed 25-slot collection with real PNG assets
+(function(){
+ const BUHRSI_CATALOG=[
+  {number:1,species:"Moxu",variant:"moxu",rarity:"COMMON"},
+  {number:2,species:"Pünktchen",variant:"puenktchen",rarity:"COMMON"},
+  {number:3,species:"Pombli",legacySpecies:"Sonnenschein",variant:"sonnenschein",rarity:"COMMON"},
+  {number:4,species:"Zorli",legacySpecies:"Flämmchen",variant:"flaemmchen",rarity:"COMMON"},
+  {number:5,species:"Nubbi",legacySpecies:"Bluupy",variant:"bluupy",rarity:"COMMON"},
+  {number:6,species:"Raxu",legacySpecies:"Rosalie",variant:"rosalie",rarity:"RARE"},
+  {number:7,species:"Quenzi",legacySpecies:"Brillberto",variant:"brillberto",rarity:"RARE"},
+  {number:8,species:"Mivaro",legacySpecies:"Zauberlin",variant:"zauberlin",rarity:"RARE"},
+  {number:9,species:"Kivvi",legacySpecies:"Herzilein",variant:"herzilein",rarity:"RARE"},
+  {number:10,species:"Tovvi",legacySpecies:"Zitro",variant:"zitro",rarity:"COMMON"},
+  {number:11,species:"Aveli",legacySpecies:"Pinkadora",variant:"pinkadora",rarity:"RARE"},
+  {number:12,species:"Droxu",legacySpecies:"Wellenbob",variant:"wellenbob",rarity:"COMMON"},
+  {number:13,species:"Fendri",legacySpecies:"Detekto",variant:"detekto",rarity:"RARE"},
+  {number:14,species:"Orvix",legacySpecies:"Königchen",variant:"koenigchen",rarity:"RARE"},
+  {number:15,species:"Kraxlo",legacySpecies:"Lavaknirp",variant:"lavaknirp",rarity:"LEGENDARY"},
+  {number:16,species:"Tulmo",legacySpecies:"Schlumpfi",variant:"schlumpfi",rarity:"COMMON"},
+  {number:17,species:"Zelvi",legacySpecies:"Glitzerglück",variant:"glitzerglueck",rarity:"EPIC"},
+  {number:18,species:"Amethysta",variant:"amethysta",rarity:"EPIC"},
+  {number:19,species:"Smaragdus",variant:"smaragdus",rarity:"EPIC"},
+  {number:20,species:"Käpt'n Keks",variant:"kaeptn_keks",rarity:"RARE"},
+  {number:21,species:"Regenknirps",variant:"regenknirps",rarity:"COMMON"},
+  {number:22,species:"Nexari",legacySpecies:"Aurorix",variant:"aurorix",rarity:"LEGENDARY"},
+  {number:23,species:"Mondmäuschen",variant:"mondmaeuschen",rarity:"LEGENDARY"},
+  {number:24,species:"Sonnenfürst",variant:"sonnenfuerst",rarity:"LEGENDARY"},
+  {number:25,species:"Kuro",variant:"kuro",rarity:"NEUTRAL",companion:true}
+ ].map(entry=>({...entry,image:`assets/buhrsis/${entry.variant}.png`}));
+
+ const grid=document.getElementById("buhrsiGrid");
+ const count=document.getElementById("collectionCount");
+ const detail=document.getElementById("buhrsiDetail");
+ const detailVisual=document.getElementById("detailVisual");
+ const detailImage=document.getElementById("detailImage");
+ const byVariant=new Map(BUHRSI_CATALOG.map(entry=>[entry.variant,entry]));
+ const normalize=value=>String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+ const bySpecies=new Map(BUHRSI_CATALOG.flatMap(entry=>[entry.species,entry.legacySpecies].filter(Boolean).map(species=>[normalize(species),entry])));
+ const rarityLabel=rarity=>({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR",NEUTRAL:"BEGLEITER"})[rarity]||rarity;
+ const numberOr=(value,fallback)=>Number.isFinite(Number(value))?Number(value):fallback;
+ let activeProfileId="";
+
+ function catalogEntry(row){
+  return byVariant.get(normalize(row?.variant))||bySpecies.get(normalize(row?.species));
+ }
+
+ function ownedByVariant(rows){
+  const owned=new Map();
+  (rows||[]).forEach(row=>{
+   const entry=catalogEntry(row);
+   if(entry&&!owned.has(entry.variant))owned.set(entry.variant,row);
+  });
+  const profile=window.BuhrsiHatch?.profile?.()||{};
+  if(!owned.has("kuro")){
+   owned.set("kuro",{
+    species:"Kuro",variant:"kuro",rarity:"NEUTRAL",current_value:0,
+    bond:50,gloss:numberOr(profile.gloss,50),is_companion:true
+   });
+  }
+  return owned;
+ }
+
+ function createVisual(entry,isDiscovered){
+  const visual=document.createElement("div");
+  visual.className="buhrsi-visual "+(isDiscovered?"is-discovered":"is-silhouette");
+  const img=document.createElement("img");
+  img.className="buhrsi-image";
+  img.src=entry.image;
+  img.alt=isDiscovered?entry.species:"";
+  img.loading="lazy";
+  img.decoding="async";
+  if(!isDiscovered)img.setAttribute("aria-hidden","true");
+  img.addEventListener("error",()=>{img.hidden=true;visual.classList.add("image-missing")},{once:true});
+  visual.append(img);
+  return visual;
+ }
+
+ function createCard(entry,row){
+  const discovered=Boolean(row);
+  const rarity=entry.companion?"NEUTRAL":entry.rarity||row?.rarity;
+  const card=document.createElement("button");
+  card.type="button";
+  card.className="buhrsi-card"+(discovered?" is-discovered":" is-undiscovered");
+  card.dataset.rarity=discovered?rarity:"UNKNOWN";
+  card.setAttribute("aria-label",discovered?`${entry.species}, ${rarityLabel(rarity)}`:`Unentdecktes Buhrsi Nummer ${entry.number}`);
+  card.append(createVisual(entry,discovered));
+
+  const slot=document.createElement("span");
+  slot.className="buhrsi-slot";
+  slot.textContent=String(entry.number).padStart(2,"0");
+  const name=document.createElement("strong");
+  name.textContent=discovered?entry.species:"???";
+  const rarityText=document.createElement("small");
+  rarityText.textContent=discovered?rarityLabel(rarity):"UNENTDECKT";
+  const value=document.createElement("span");
+  value.className="buhrsi-card-value";
+  value.textContent=discovered?(entry.companion?"Standardbegleiter":`${numberOr(row.current_value,0)} Wert`):"Noch nicht entdeckt";
+  card.append(slot,name,rarityText,value);
+
+  if(discovered)card.addEventListener("click",()=>openDetail(entry,row,rarity));
+  else card.disabled=true;
+  return card;
+ }
+
+ function openDetail(entry,row,rarity){
+  document.getElementById("detailRarity").textContent=rarityLabel(rarity);
+  document.getElementById("detailName").textContent=entry.species;
+  document.getElementById("detailValue").textContent=numberOr(row.current_value,0);
+  document.getElementById("detailBond").textContent=numberOr(row.bond,50);
+  document.getElementById("detailGloss").textContent=numberOr(row.gloss,50);
+  detailVisual?.classList.remove("image-missing");
+  if(detailImage){
+   detailImage.hidden=false;
+   detailImage.alt=entry.species;
+   detailImage.onerror=()=>{detailImage.hidden=true;detailVisual?.classList.add("image-missing")};
+   detailImage.src=entry.image;
+  }
+  detail.hidden=false;
+ }
+
+ function renderCollection(rows){
+  if(!grid)return;
+  const owned=ownedByVariant(rows);
+  grid.innerHTML="";
+  BUHRSI_CATALOG.forEach(entry=>grid.append(createCard(entry,owned.get(entry.variant))));
+  if(count)count.textContent=`${owned.size} / ${BUHRSI_CATALOG.length} entdeckt`;
+ }
+
  document.getElementById("closeBuhrsiDetail")?.addEventListener("click",()=>detail.hidden=true);
- window.refreshCollection=async()=>{let api=window.BuhrsiCollection;if(!api)return;let a=await api.list();if(!grid)return;grid.innerHTML="";count.textContent=a.length+" entdeckt";if(!a.length)grid.innerHTML='<p class="empty-collection">Dein erstes Buhrsi wartet noch im Ei.</p>';else a.forEach(b=>grid.append(card(b)))};
+ detail?.addEventListener("click",event=>{if(event.target===detail)detail.hidden=true});
+ document.addEventListener("keydown",event=>{if(event.key==="Escape"&&detail&&!detail.hidden)detail.hidden=true});
+
+ window.BuhrsiCatalog=BUHRSI_CATALOG;
+ window.refreshCollection=async()=>{
+  const api=window.BuhrsiCollection;
+  if(!api){renderCollection([]);return}
+  renderCollection(await api.list());
+  activeProfileId=String(window.BuhrsiHatch?.profile?.()?.id||"");
+ };
+
+ renderCollection([]);
  setTimeout(window.refreshCollection,1200);
+ setInterval(()=>{
+  const profileId=String(window.BuhrsiHatch?.profile?.()?.id||"");
+  if(profileId&&profileId!==activeProfileId)window.refreshCollection();
+ },1500);
 })();
 
 // v0.8.2: Zahnputz-Tipps vollständig entfernt.
