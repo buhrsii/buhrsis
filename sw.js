@@ -1,4 +1,4 @@
-const CACHE = "buhrsis-v016-collection-slots";
+const CACHE = "buhrsis-v017-two-minute-timer";
 const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install", event => {

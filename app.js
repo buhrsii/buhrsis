@@ -1,7 +1,8 @@
 const $=s=>document.querySelector(s);
 const defaults={xp:120,glanz:68,streak:0,lastBrush:null,eggEnergy:0};
 const state={...defaults,...JSON.parse(localStorage.getItem('buhrsiState')||'{}')};
-let left=45,timer=null,lastZone=-1;
+const BRUSH_DURATION=120;
+let left=BRUSH_DURATION,timer=null,lastZone=-1;
 const zones=[
   ['OBEN AUSSEN','Putze die Außenflächen oben'],
   ['UNTEN AUSSEN','Jetzt die Außenflächen unten'],
@@ -57,11 +58,11 @@ function brushVibrate(done=false){
 }
 function openBrush(){
  if(timer)return;
- initBrushAudio(); prepareBrushAudio(); unlockBrushAudio(); left=45;lastZone=-1;lastSignalZone=0;finishing=false;
- brushStartedAt=Date.now();brushEndAt=brushStartedAt+45000;
+ initBrushAudio(); prepareBrushAudio(); unlockBrushAudio(); left=BRUSH_DURATION;lastZone=-1;lastSignalZone=0;finishing=false;
+ brushStartedAt=Date.now();brushEndAt=brushStartedAt+(BRUSH_DURATION*1000);
  sessionStorage.setItem("buhrsiBrushEndAt",String(brushEndAt));
  $('#brushScreen').classList.add('open');document.body.classList.add('locked');
- $('#brushTime').textContent='00:45';$('#brushRing').style.setProperty('--progress','0deg');updateZone(true);
+ $('#brushTime').textContent=format(BRUSH_DURATION);$('#brushRing').style.setProperty('--progress','0deg');updateZone(true);
  window.dispatchEvent(new Event("buhrsi:brush-start"));
  setTimeout(()=>brushTone(false),80);
  setTimeout(runTimer,250);
@@ -75,14 +76,14 @@ function runTimer(){
    left=remaining;
    if(left>0 && left<=10 && left!==previousLeft) brushTone(false);
    $('#brushTime').textContent=format(left);
-   $('#brushRing').style.setProperty('--progress',((45-left)/45*360)+'deg');
+   $('#brushRing').style.setProperty('--progress',((BRUSH_DURATION-left)/BRUSH_DURATION*360)+'deg');
    updateZone();
    if(left<=0)finish();
  };
  tick();timer=setInterval(tick,250);
 }
 function updateZone(force=false){
- const elapsed=Math.min(45,Math.max(0,45-left)),zi=Math.min(3,Math.floor(elapsed/11.25));
+ const elapsed=Math.min(BRUSH_DURATION,Math.max(0,BRUSH_DURATION-left)),zi=Math.min(3,Math.floor(elapsed/(BRUSH_DURATION/4)));
  if(force||zi!==lastZone){
    const previous=lastZone;lastZone=zi;
    $('#brushZone').textContent=zones[zi][0];$('#brushHint').textContent=zones[zi][1];
