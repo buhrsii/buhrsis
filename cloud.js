@@ -92,7 +92,14 @@ window.BuhrsiStreaks={
 };
 
 window.BuhrsiAdmin={
- async resetProgress(id){const {error}=await sb.rpc("reset_child_progress",{p_child:id});return {ok:!error,error}},
+ async resetProgress(id){
+   const {error}=await sb.rpc("reset_child_progress",{p_child:id});
+   if(!error&&child&&String(child.id)===String(id)){
+     child={...child,xp:0,gloss:0,streak:0,egg_energy:0,perfect_streak:0,last_brush_date:null,last_perfect_date:null};
+     try{localStorage.setItem("buhrsiChild",JSON.stringify(child));window.BuhrsiDeviceSession?.saveChild?.(child)}catch(e){}
+   }
+   return {ok:!error,error}
+ },
  async deleteChild(id){const {error}=await sb.rpc("delete_child_account",{p_child:id});return {ok:!error,error}},
  async resetPin(id,pin){const {error}=await sb.rpc("reset_child_pin",{p_child:id,p_pin:pin});return {ok:!error,error}},
  async reload(){await profiles()}

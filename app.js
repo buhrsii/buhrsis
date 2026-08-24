@@ -401,7 +401,19 @@ document.addEventListener("DOMContentLoaded",()=>{
  const close=()=>{modal.hidden=true;selected=null};
  document.getElementById("adminClose010")?.addEventListener("click",close);
  document.getElementById("resetPin010")?.addEventListener("click",async()=>{if(!selected)return;let pin=prompt("Neue 4-stellige PIN:");if(!/^\d{4}$/.test(pin||""))return msg.textContent="Bitte genau 4 Ziffern eingeben.";let r=await window.BuhrsiAdmin.resetPin(selected.id,pin);msg.textContent=r.ok?"PIN wurde geändert.":"PIN konnte nicht geändert werden."});
- document.getElementById("resetProgress010")?.addEventListener("click",async()=>{if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;let r=await window.BuhrsiAdmin.resetProgress(selected.id);if(!r.ok){msg.textContent="Zurücksetzen fehlgeschlagen.";return}const activeId=String(window.BuhrsiHatch?.profile?.()?.id||"");if(!activeId||activeId===String(selected.id)){window.resetBuhrsiLocalProgress?.()}try{const saved=JSON.parse(localStorage.getItem("buhrsiChild")||"null");if(saved&&String(saved.id)===String(selected.id)){Object.assign(saved,{xp:0,gloss:0,streak:0,egg_energy:0,perfect_streak:0});localStorage.setItem("buhrsiChild",JSON.stringify(saved))}}catch(e){}selected={...selected,xp:0,gloss:0,streak:0,egg_energy:0,perfect_streak:0};msg.textContent="Spielstand wurde auf 0 XP zurückgesetzt.";});
+ document.getElementById("resetProgress010")?.addEventListener("click",async event=>{
+   if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;
+   const button=event.currentTarget;button.disabled=true;msg.textContent="Spielstand wird zurückgesetzt …";
+   const r=await window.BuhrsiAdmin.resetProgress(selected.id);
+   button.disabled=false;
+   if(!r.ok){msg.textContent="Zurücksetzen fehlgeschlagen: "+(r.error?.message||"Unbekannter Fehler");return}
+   const activeId=String(window.BuhrsiHatch?.profile?.()?.id||"");
+   if(!activeId||activeId===String(selected.id))window.resetBuhrsiLocalProgress?.();
+   selected={...selected,xp:0,gloss:0,streak:0,egg_energy:0,perfect_streak:0,last_brush_date:null,last_perfect_date:null};
+   window.dispatchEvent(new CustomEvent("buhrsi:progress-reset",{detail:selected}));
+   await window.refreshLeaderboard?.();
+   msg.textContent="Spielstand und Rangliste wurden auf 0 XP zurückgesetzt.";
+ });
  document.getElementById("deleteChild010")?.addEventListener("click",async()=>{if(!selected||!confirm("Kinderkonto wirklich vollständig löschen? Dieser Schritt kann nicht rückgängig gemacht werden."))return;let r=await window.BuhrsiAdmin.deleteChild(selected.id);if(r.ok){close();await window.BuhrsiAdmin.reload()}else msg.textContent="Löschen fehlgeschlagen."});
  document.getElementById("startChildAdmin0154")?.addEventListener("click",()=>{if(!selected)return;const profile=selected;close();window.parentOpenChild0152?.(profile)});
 })();
@@ -418,6 +430,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("buhrsi:child-change",update);
  window.addEventListener("buhrsi:brush-complete",update);
  window.addEventListener("buhrsi:progress-saved",update);
+ window.addEventListener("buhrsi:progress-reset",update);
  btn?.addEventListener("click",async()=>{
    btn.disabled=true;btn.textContent="DAS EI BRICHT AUF …";
    const r=await window.BuhrsiHatch?.hatch?.();
@@ -627,6 +640,7 @@ window.addEventListener("load",()=>{
  setTimeout(loadBoard,1200);
  window.addEventListener("buhrsi:child-change",()=>setTimeout(loadBoard,100));
  window.addEventListener("buhrsi:progress-saved",loadBoard);
+ window.addEventListener("buhrsi:progress-reset",loadBoard);
 })();
 
 // v0.15.0 child onboarding guard
