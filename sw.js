@@ -1,4 +1,4 @@
-const CACHE = "buhrsis-v023-clear-child-login";
+const CACHE = "buhrsis-v024-live-ranking-xp";
 const ASSETS = ["./","./index.html","./styles.css","./app.js","./cloud.js","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-moxu-192.png","./icon-moxu-512.png"];
 
 self.addEventListener("install", event => {

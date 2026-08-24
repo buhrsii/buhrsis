@@ -151,7 +151,7 @@ render();
     if(c?.saveProgress) await c.saveProgress(readLocal());
     renderEgg();
   }
-  window.addEventListener("buhrsi:brush-complete",async()=>{ await sync(); await window.BuhrsiCloud?.logBrush?.(120,20,3); });
+  window.addEventListener("buhrsi:brush-complete",()=>renderEgg());
   document.addEventListener("click",e=>{
     if(e.target.closest(".reward-close,.reward-continue,[data-action='continue']")) setTimeout(sync,100);
   });
@@ -380,7 +380,17 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("buhrsi:child-change",()=>render(window.BuhrsiStreaks?.profile?.()));
  window.addEventListener("buhrsi:brush-complete",async()=>{
    const r=await window.BuhrsiStreaks?.complete?.(120);
-   if(r?.ok)render(r.profile,r.brushes_today,r.perfect_day);
+   if(r?.ok){
+     if(r.profile){
+       state.xp=Number(r.profile.xp)||0;
+       state.glanz=Number(r.profile.gloss)||0;
+       state.streak=Number(r.profile.streak)||0;
+       state.eggEnergy=Number(r.profile.egg_energy)||0;
+       save();render();
+     }
+     render(r.profile,r.brushes_today,r.perfect_day);
+     window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:r.profile}));
+   }
  });
 })();
 
@@ -407,6 +417,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  setTimeout(update,600);
  window.addEventListener("buhrsi:child-change",update);
  window.addEventListener("buhrsi:brush-complete",update);
+ window.addEventListener("buhrsi:progress-saved",update);
  btn?.addEventListener("click",async()=>{
    btn.disabled=true;btn.textContent="DAS EI BRICHT AUF …";
    const r=await window.BuhrsiHatch?.hatch?.();
@@ -615,7 +626,7 @@ window.addEventListener("load",()=>{
  window.refreshLeaderboard=loadBoard;
  setTimeout(loadBoard,1200);
  window.addEventListener("buhrsi:child-change",()=>setTimeout(loadBoard,100));
- window.addEventListener("buhrsi:brush-complete",()=>setTimeout(loadBoard,700));
+ window.addEventListener("buhrsi:progress-saved",loadBoard);
 })();
 
 // v0.15.0 child onboarding guard

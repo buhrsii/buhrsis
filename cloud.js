@@ -1,5 +1,6 @@
 const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co"; const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
-let sb,user,child,childModeSession=false;
+let sb,user,child,childModeSession=false,childPin="";
+try{childPin=sessionStorage.getItem("buhrsiChildPin")||""}catch(e){}
 const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"";
 function show(id){["roleView","childLoginView","authView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
 function app(on){$("#authGate").hidden=on;$(".app").hidden=!on}
@@ -30,11 +31,11 @@ async function profiles(){
 }
 $("#childMode").onclick=()=>{msg();show("childLoginView")}; $("#parentMode").onclick=()=>{msg();show("authView")};
 document.querySelectorAll(".back-auth").forEach(b=>b.onclick=()=>{msg();show("roleView")});
-$("#childLoginForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("verify_child_pin",{p_username:$("#childUsernameLogin").value.trim(),p_pin:$("#childPinLogin").value});if(error)return msg(error.message);if(!data?.length)return msg("Name oder PIN stimmt nicht.");choose(data[0],true)};
+$("#childLoginForm").onsubmit=async e=>{e.preventDefault();msg();const pin=$("#childPinLogin").value;let {data,error}=await sb.rpc("verify_child_pin",{p_username:$("#childUsernameLogin").value.trim(),p_pin:pin});if(error)return msg(error.message);if(!data?.length)return msg("Name oder PIN stimmt nicht.");childPin=pin;try{sessionStorage.setItem("buhrsiChildPin",pin)}catch(e){}choose(data[0],true)};
 $("#authForm").onsubmit=async e=>{e.preventDefault();msg();let email=$("#email").value.trim(),password=$("#password").value,mode=e.submitter.dataset.mode;if(mode==="signup"){let {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(error)return msg(error.message);return msg("Konto erstellt. Bitte E-Mail bestätigen.")}let {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg("Anmeldung fehlgeschlagen: "+error.message);user=data.user;await profiles()};
 $("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("create_child_account",{p_name:$("#childName").value.trim(),p_username:$("#childUsername").value.trim(),p_pin:$("#childPin").value});if(error)return msg(error.message);$("#childForm").reset();await profiles()};
 $("#logoutBtn").onclick=async()=>{
-try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");window.BuhrsiDeviceSession?.clearChild?.()}catch(e){}
+try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");sessionStorage.removeItem("buhrsiChildPin");window.BuhrsiDeviceSession?.clearChild?.()}catch(e){}
 child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView")};
 try{
  let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
@@ -43,7 +44,8 @@ try{
  user=sessionData.session?.user||null;
  let saved=null,savedMode=false;
  try{saved=localStorage.getItem("buhrsiChild");savedMode=localStorage.getItem("buhrsiChildMode")==="1"}catch(e){}
- if(saved){try{choose(JSON.parse(saved),savedMode)}catch(e){localStorage.removeItem("buhrsiChild")}}
+ if(saved&&(!savedMode||childPin)){try{choose(JSON.parse(saved),savedMode)}catch(e){localStorage.removeItem("buhrsiChild")}}
+ else if(savedMode){try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode")}catch(e){}app(false);show("childLoginView")}
  else if(user)await profiles();
  else{app(false);show("roleView")}
 }catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
@@ -76,10 +78,15 @@ window.BuhrsiCollection={
 
 window.BuhrsiStreaks={
  async complete(duration=120){
-   if(!sb||!child||childModeSession)return {ok:false,reason:"child-session"};
-   const {data,error}=await sb.rpc("complete_brushing_v091",{p_child:child.id,p_duration:duration});
+   if(!sb||!child)return {ok:false,reason:"no-child"};
+   if(childModeSession&&!childPin)return {ok:false,reason:"child-login-required"};
+   const fn=childModeSession?"complete_child_brushing_v024":"complete_brushing_v091";
+   const args=childModeSession?{p_child:child.id,p_pin:childPin,p_duration:duration}:{p_child:child.id,p_duration:duration};
+   const {data,error}=await sb.rpc(fn,args);
    if(error){console.error(error);return {ok:false,error}}
-   child=data.profile;return {ok:true,...data}
+   child=data.profile;
+   try{localStorage.setItem("buhrsiChild",JSON.stringify(child));window.BuhrsiDeviceSession?.saveChild?.(child)}catch(e){}
+   return {ok:true,...data}
  },
  profile(){return child}
 };
