@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s);
-const defaults={xp:120,glanz:68,streak:0,lastBrush:null,eggEnergy:0};
+const defaults={xp:0,glanz:0,streak:0,lastBrush:null,eggEnergy:0};
 const state={...defaults,...JSON.parse(localStorage.getItem('buhrsiState')||'{}')};
 const BRUSH_DURATION=120;
 let left=BRUSH_DURATION,timer=null,lastZone=-1;
@@ -13,11 +13,18 @@ function save(){localStorage.setItem('buhrsiState',JSON.stringify(state))}
 function render(){
  const lvl=Math.floor(state.xp/200)+1,into=state.xp%200;
  $('#xpTop').textContent=state.xp;$('#level').textContent=lvl;$('#miniLevel').textContent=lvl;
- $('#xpBar').style.width=(into/2)+'%';$('#xpToNext').textContent=200-into;
+ $('#xpBar').style.width=(into/2)+'%';$('#xpToNext').textContent=into;
  const egg=Math.min(state.eggEnergy||0,200);$('#eggXp').textContent=egg;$('#eggBar').style.width=(egg/2)+'%';
  $('#streak').textContent=state.streak;$('#glanzHome').textContent=state.glanz;
  $('#week').innerHTML='';for(let i=0;i<7;i++){let d=document.createElement('i');d.className='day'+(i<Math.min(state.streak,7)?' done':'');d.textContent=i<Math.min(state.streak,7)?'✓':'';$('#week').append(d)}
 }
+window.resetBuhrsiLocalProgress=()=>{
+ Object.assign(state,defaults);
+ save();render();
+ window.renderStreak091?.({streak:0,perfect_streak:0},0,false);
+ window.refreshCollection?.();
+ window.refreshLeaderboard?.();
+};
 function format(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 let brushEndAt=0,brushStartedAt=0,lastSignalZone=0,audioCtx=null,finishing=false;
 function initBrushAudio(){
@@ -384,7 +391,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  const close=()=>{modal.hidden=true;selected=null};
  document.getElementById("adminClose010")?.addEventListener("click",close);
  document.getElementById("resetPin010")?.addEventListener("click",async()=>{if(!selected)return;let pin=prompt("Neue 4-stellige PIN:");if(!/^\d{4}$/.test(pin||""))return msg.textContent="Bitte genau 4 Ziffern eingeben.";let r=await window.BuhrsiAdmin.resetPin(selected.id,pin);msg.textContent=r.ok?"PIN wurde geändert.":"PIN konnte nicht geändert werden."});
- document.getElementById("resetProgress010")?.addEventListener("click",async()=>{if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;let r=await window.BuhrsiAdmin.resetProgress(selected.id);msg.textContent=r.ok?"Spielstand wurde zurückgesetzt.":"Zurücksetzen fehlgeschlagen."});
+ document.getElementById("resetProgress010")?.addEventListener("click",async()=>{if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;let r=await window.BuhrsiAdmin.resetProgress(selected.id);if(!r.ok){msg.textContent="Zurücksetzen fehlgeschlagen.";return}const activeId=String(window.BuhrsiHatch?.profile?.()?.id||"");if(!activeId||activeId===String(selected.id)){window.resetBuhrsiLocalProgress?.()}try{const saved=JSON.parse(localStorage.getItem("buhrsiChild")||"null");if(saved&&String(saved.id)===String(selected.id)){Object.assign(saved,{xp:0,gloss:0,streak:0,egg_energy:0,perfect_streak:0});localStorage.setItem("buhrsiChild",JSON.stringify(saved))}}catch(e){}selected={...selected,xp:0,gloss:0,streak:0,egg_energy:0,perfect_streak:0};msg.textContent="Spielstand wurde auf 0 XP zurückgesetzt.";});
  document.getElementById("deleteChild010")?.addEventListener("click",async()=>{if(!selected||!confirm("Kinderkonto wirklich vollständig löschen? Dieser Schritt kann nicht rückgängig gemacht werden."))return;let r=await window.BuhrsiAdmin.deleteChild(selected.id);if(r.ok){close();await window.BuhrsiAdmin.reload()}else msg.textContent="Löschen fehlgeschlagen."});
  document.getElementById("startChildAdmin0154")?.addEventListener("click",()=>{if(!selected)return;const profile=selected;close();window.parentOpenChild0152?.(profile)});
 })();
