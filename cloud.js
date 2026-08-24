@@ -12,7 +12,7 @@ function choose(p,isChild=false){
    window.BuhrsiDeviceSession?.saveChild?.(p);
  }catch(e){}
  app(true);
- window.dispatchEvent(new Event("buhrsi:child-change"));
+ window.dispatchEvent(new CustomEvent("buhrsi:child-change",{detail:p}));
 }
 async function profiles(){
  let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");
@@ -44,8 +44,8 @@ try{
  user=sessionData.session?.user||null;
  let saved=null,savedMode=false;
  try{saved=localStorage.getItem("buhrsiChild");savedMode=localStorage.getItem("buhrsiChildMode")==="1"}catch(e){}
- if(saved&&(!savedMode||childPin)){try{choose(JSON.parse(saved),savedMode)}catch(e){localStorage.removeItem("buhrsiChild")}}
- else if(savedMode){try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode")}catch(e){}app(false);show("childLoginView")}
+ if(saved&&((savedMode&&childPin)||(!savedMode&&user))){try{choose(JSON.parse(saved),savedMode)}catch(e){localStorage.removeItem("buhrsiChild")}}
+ else if(saved){try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode")}catch(e){}app(false);show(savedMode?"childLoginView":"roleView")}
  else if(user)await profiles();
  else{app(false);show("roleView")}
 }catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
@@ -161,11 +161,7 @@ window.restoreLastBuhrsiChild=async function(){
    if(!id)return false;
    const {data,error}=await sb.from("child_profiles").select("*").eq("id",id).eq("parent_id",session.user.id).maybeSingle();
    if(error||!data)return false;
-   child=data;
-   childModeSession=false;
-   window.BuhrsiDeviceSession.saveChild(data);
-   try{showApp?.()}catch(e){}
-   try{render?.()}catch(e){}
+   choose(data,false);
    try{window.renderStreak091?.(data)}catch(e){}
    return true;
  }catch(e){console.error("restore child",e);return false}
@@ -183,18 +179,9 @@ window.BuhrsiLeaderboard={
 // v0.15.2 parent navigation
 window.parentOpenChild0152=function(profile){
   if(!profile)return;
-  child=profile;
-  childModeSession=false;
-  try{
-    localStorage.setItem("buhrsiChild",JSON.stringify(profile));
-    localStorage.setItem("buhrsiChildMode","0");
-    window.BuhrsiDeviceSession?.saveChild?.(profile);
-  }catch(e){}
-  try{$("#profileName").textContent=profile.name}catch(e){}
+  choose(profile,false);
   document.body.classList.remove("locked");
   document.querySelectorAll(".overlay.open,.modal.open,.popup.open").forEach(x=>x.classList.remove("open"));
-  try{app(true)}catch(e){try{showApp?.()}catch(_){}}
-  try{render?.()}catch(e){}
 };
 
 // v0.15.3 explicit parent child controls
@@ -212,16 +199,8 @@ window.renderParentChildActions0153=function(){
      if(!username)return;
      const {data,error}=await sb.from("child_profiles").select("*").eq("username",username).limit(1).maybeSingle();
      if(error||!data){console.error(error);return}
-     child=data;childModeSession=false;
-     try{
-       localStorage.setItem("buhrsiChild",JSON.stringify(data));
-       localStorage.setItem("buhrsiChildMode","0");
-       window.BuhrsiDeviceSession?.saveChild?.(data);
-     }catch(_){}
+     choose(data,false);
      document.body.classList.remove("locked");
-     try{$("#profileName").textContent=data.name}catch(_){}
-     try{app(true)}catch(_){try{showApp?.()}catch(__){}}
-     try{render?.()}catch(_){}
    });
    card.appendChild(btn);
  });

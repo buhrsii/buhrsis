@@ -126,6 +126,17 @@ function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');se
 $('#start').onclick=openBrush;$('#rewardDone').onclick=closeReward;
 render();
 
+function applyCloudProfile026(profile){
+ if(!profile)return;
+ state.xp=Number(profile.xp)||0;
+ state.glanz=Number(profile.gloss)||0;
+ state.streak=Number(profile.streak)||0;
+ state.eggEnergy=Number(profile.egg_energy)||0;
+ save();render();
+}
+window.applyCloudProfile026=applyCloudProfile026;
+window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.detail||window.BuhrsiStreaks?.profile?.()));
+
 // v0.5 cloud/egg adapter
 (function(){
   const EGG_MAX=100;
@@ -380,14 +391,13 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("buhrsi:child-change",()=>render(window.BuhrsiStreaks?.profile?.()));
  window.addEventListener("buhrsi:brush-complete",async()=>{
    const r=await window.BuhrsiStreaks?.complete?.(120);
+   if(!r?.ok){
+     applyCloudProfile026(window.BuhrsiStreaks?.profile?.());
+     toast("Speichern fehlgeschlagen – bitte neu anmelden");
+     return;
+   }
    if(r?.ok){
-     if(r.profile){
-       state.xp=Number(r.profile.xp)||0;
-       state.glanz=Number(r.profile.gloss)||0;
-       state.streak=Number(r.profile.streak)||0;
-       state.eggEnergy=Number(r.profile.egg_energy)||0;
-       save();render();
-     }
+     applyCloudProfile026(r.profile);
      render(r.profile,r.brushes_today,r.perfect_day);
      window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:r.profile}));
    }

@@ -1,4 +1,9 @@
 -- Einmal vollständig im Supabase SQL Editor ausführen.
+alter table public.child_profiles
+  add column if not exists perfect_streak integer not null default 0 check (perfect_streak >= 0),
+  add column if not exists last_brush_date date,
+  add column if not exists last_perfect_date date;
+
 create or replace function public.complete_child_brushing_v024(
   p_child uuid,
   p_pin text,
@@ -118,7 +123,6 @@ as $$
       max(coalesce(c.streak,0))::integer as streak
     from public.child_profiles c
     where c.is_active=true
-      and lower(trim(c.name)) not in ('papa','mama')
     group by lower(trim(c.name))
   ), ranked as (
     select
