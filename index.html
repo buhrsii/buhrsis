@@ -1,15 +1,18 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0e0f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Buhrsi's"><link rel="apple-touch-icon" href="icon-moxu-192.png"><title>Buhrsi's</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css"></head><body><section id="authGate" class="auth-gate"><div class="auth-card">
 <div class="auth-brand"><span>B</span><strong>Buhrsi’s</strong></div>
-<div id="roleView"><p class="eyebrow">WILLKOMMEN</p><h1>Wer bist du?</h1>
-<button id="childMode" class="role-btn" type="button">🐾 <b>KIND</b><small>Ich möchte putzen</small></button>
-<button id="parentMode" class="role-btn" type="button">⚙️ <b>ELTERN</b><small>Elternbereich</small></button></div>
-<div id="childLoginView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">KINDER-LOGIN</p><h1>Willkommen zurück</h1>
-<form id="childLoginForm"><label>Buhrsi-Name<input id="childUsernameLogin" maxlength="20" autocomplete="username" required></label>
+<div id="roleView"><p class="eyebrow">WILLKOMMEN</p><h1>Schon ein Konto?</h1>
+<p class="auth-copy">Ein bestehendes Kinderkonto kannst du auch auf einem neuen Gerät benutzen.</p>
+<button id="childMode" class="role-btn" type="button">🔑 <b>KINDERKONTO ANMELDEN</b><small>Mit Benutzername und 4-stelliger PIN</small></button>
+<button id="parentMode" class="role-btn" type="button">⚙️ <b>ELTERNBEREICH</b><small>Kinder verwalten oder ein neues Kinderkonto anlegen</small></button></div>
+<div id="childLoginView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">VORHANDENES KINDERKONTO</p><h1>Als Kind einloggen</h1>
+<p class="auth-copy">Benutze denselben Benutzernamen und dieselbe PIN – auch auf einem neuen Gerät.</p>
+<form id="childLoginForm"><label>Buhrsi-Benutzername<input id="childUsernameLogin" maxlength="20" autocomplete="username" required></label>
 <label>4-stellige PIN<input id="childPinLogin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label>
-<button class="primary" type="submit">LOS GEHT’S</button></form></div>
+<button class="primary" type="submit">KINDERKONTO ANMELDEN</button></form></div>
 <div id="authView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">ELTERNBEREICH</p><h1>Elternkonto</h1>
+<p class="auth-copy">Hier kannst du Kinder verwalten oder ein neues Kinderkonto anlegen.</p>
 <form id="authForm"><label>E-Mail<input id="email" type="email" autocomplete="email" required></label><label>Passwort<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
-<button class="primary" data-mode="login" type="submit">ANMELDEN</button><button class="secondary" data-mode="signup" type="submit">ELTERNKONTO ERSTELLEN</button></form></div>
+<button class="primary" data-mode="login" type="submit">ELTERNKONTO ANMELDEN</button><button class="secondary" data-mode="signup" type="submit">ELTERNKONTO ERSTELLEN</button></form></div>
 <div id="profileView" hidden><p class="eyebrow">ELTERNBEREICH</p><h1>Kinderkonten</h1><div id="profileList"></div>
 <form id="childForm"><label>Name<input id="childName" maxlength="30" required></label><label>Buhrsi-Benutzername<input id="childUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" required></label>
 <label>4-stellige PIN<input id="childPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label><button class="primary" type="submit">KINDERKONTO ANLEGEN</button></form></div>
