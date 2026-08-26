@@ -1,0 +1,93 @@
+const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co";
+const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
+
+const normalize=v=>String(v||"").trim().toLowerCase();
+function readChild(){try{return JSON.parse(localStorage.getItem("buhrsiChild")||"null")}catch(e){return null}}
+function childMode(){try{return localStorage.getItem("buhrsiChildMode")==="1"}catch(e){return false}}
+function deviceToken(){try{return localStorage.getItem("buhrsiChildDeviceToken")||sessionStorage.getItem("buhrsiChildPin")||""}catch(e){return ""}}
+
+function rarityLabel(r){
+  return ({COMMON:"HÄUFIG",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR"})[String(r||"").toUpperCase()]||String(r||"");
+}
+
+function removeKuroCompanionSlot(){
+  const catalog=window.BuhrsiCatalog;
+  if(!Array.isArray(catalog))return;
+  for(let i=catalog.length-1;i>=0;i--){
+    const e=catalog[i];
+    if(e?.companion||normalize(e?.variant)==="kuro")catalog.splice(i,1);
+  }
+}
+
+function catalogEntry(row){
+  const catalog=window.BuhrsiCatalog||[];
+  return catalog.find(e=>normalize(e.variant)===normalize(row?.variant))
+    ||catalog.find(e=>normalize(e.species)===normalize(row?.species)||normalize(e.legacySpecies)===normalize(row?.species));
+}
+
+function renderHomeOwned(rows=[]){
+  const section=document.querySelector("section.card.collection");
+  if(!section)return;
+  const count=section.querySelector(".section-title span");
+  const card=section.querySelector(".creature-card");
+  if(count)count.textContent=`${rows.length} entdeckt`;
+  if(!card)return;
+  const row=rows[0];
+  if(!row){
+    card.innerHTML='<div class="mini-creature" style="display:grid;place-items:center;font-size:3rem">🥚</div><b>Noch kein Buhrsi</b><small>Dein Ei sammelt Energie</small>';
+    return;
+  }
+  const entry=catalogEntry(row);
+  const name=entry?.species||row.species||"Buhrsi";
+  const image=entry?.image||`assets/buhrsis/${entry?.variant||row.variant}.png`;
+  card.innerHTML=`<div class="mini-creature" style="background:none"><img src="${image}" alt="${name}" style="width:100%;height:100%;object-fit:contain"></div><b>${name}</b><small>${Number(row.current_value)||0} Sammlerwert</small><em>${rarityLabel(row.rarity)}</em>`;
+}
+
+try{
+  const m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  const sb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  const originalCollection=window.BuhrsiCollection;
+  const originalHatch=window.BuhrsiHatch;
+
+  removeKuroCompanionSlot();
+
+  async function list(){
+    const child=readChild();
+    if(!child)return [];
+    let rows=[];
+    if(childMode()){
+      const token=deviceToken();
+      if(!token)return [];
+      const {data,error}=await sb.rpc("buhrsi_child_collection",{p_child:child.id,p_token:token});
+      if(error){console.error("Kinder-Sammlung:",error);return []}
+      rows=data||[];
+    }else if(originalCollection?.list){
+      rows=await originalCollection.list();
+    }
+    renderHomeOwned(rows);
+    return rows;
+  }
+
+  async function hatch(){
+    const child=readChild();
+    if(!child)return {ok:false,reason:"no-child"};
+    if(childMode()){
+      const token=deviceToken();
+      if(!token)return {ok:false,reason:"no-device-session"};
+      const {data,error}=await sb.rpc("buhrsi_child_hatch_ready_egg",{p_child:child.id,p_token:token});
+      if(error){console.error("Kinder-Schlüpfen:",error);return {ok:false,error}}
+      try{
+        const saved={...child,egg_energy:0};
+        localStorage.setItem("buhrsiChild",JSON.stringify(saved));
+      }catch(e){}
+      return {ok:true,data};
+    }
+    return originalHatch?.hatch?originalHatch.hatch():{ok:false,reason:"no-hatch-api"};
+  }
+
+  window.BuhrsiCollection={...(originalCollection||{}),list};
+  window.BuhrsiHatch={...(originalHatch||{}),hatch,collection:list};
+
+  setTimeout(()=>window.refreshCollection?.(),150);
+  window.addEventListener("buhrsi:child-change",()=>setTimeout(()=>window.refreshCollection?.(),100));
+}catch(e){console.error("Collection Fix konnte nicht geladen werden",e)}
