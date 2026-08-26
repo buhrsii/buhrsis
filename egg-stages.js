@@ -5,7 +5,8 @@ const EGG_STAGE_ASSETS={
   6:"./assets/eggs/egg-stage-06.webp",
   7:"./assets/eggs/egg-stage-07.webp",
   8:"./assets/eggs/egg-stage-08.webp",
-  9:"./assets/eggs/egg-stage-09.webp"
+  9:"./assets/eggs/egg-stage-09.webp",
+  10:"./assets/eggs/egg-stage-10.webp"
 };
 
 function readEggEnergy(){
@@ -15,8 +16,7 @@ function readEggEnergy(){
   }catch(e){return 0}
 }
 function stageForEnergy(energy){
-  if(energy>=200)return 10;
-  return Math.min(9,Math.floor(energy/20)+1);
+  return Math.min(10,Math.floor(energy/20)+1);
 }
 function nearestAvailableStage(stage){
   for(let s=stage;s>=1;s--)if(EGG_STAGE_ASSETS[s])return s;
