@@ -7,7 +7,7 @@ as $$
   select b.*
   from public.buhrsis b
   where b.child_id=p_child
-    and public.buhrsi_child_device_authorized(p_child,p_token)
+    and public.buhrsi_social_authorized(p_child,p_token)
   order by b.born_at desc;
 $$;
 revoke all on function public.buhrsi_child_collection(uuid,text) from public;
@@ -27,7 +27,7 @@ declare
   v_species text;
   b public.buhrsis;
 begin
-  if not public.buhrsi_child_device_authorized(p_child,p_token) then
+  if not public.buhrsi_social_authorized(p_child,p_token) then
     raise exception 'invalid child session';
   end if;
 
