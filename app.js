@@ -139,7 +139,7 @@ window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.
 
 // v0.5 cloud/egg adapter
 (function(){
-  const EGG_MAX=100;
+  const EGG_MAX=200;
   function readLocal(){
     let s={};
     try{s=JSON.parse(localStorage.getItem("buhrsiState")||localStorage.getItem("buhrsis-state")||"{}")}catch(e){}
@@ -148,14 +148,14 @@ window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.
       streak:Number(s.streak)||0, eggEnergy:Number(s.eggEnergy ?? s.egg_energy)||0
     };
   }
-  function eggStage(e){ if(e>=100)return 4;if(e>=75)return 3;if(e>=45)return 2;if(e>=20)return 1;return 0; }
+  function eggStage(e){ return Math.min(10,Math.floor(Math.max(0,e)/20)+1); }
   function renderEgg(){
     const p=readLocal(), el=document.getElementById("eggV05");
     if(!el)return;
     const st=eggStage(p.eggEnergy);
     el.dataset.stage=String(st);
-    el.querySelector(".egg-v05-fill").style.width=Math.min(100,p.eggEnergy)+"%";
-    el.querySelector(".egg-v05-label").textContent=p.eggEnergy>=100?"Bereit zum Schlüpfen":p.eggEnergy+" / "+EGG_MAX+" Energie";
+    el.querySelector(".egg-v05-fill").style.width=Math.min(100,p.eggEnergy/2)+"%";
+    el.querySelector(".egg-v05-label").textContent=p.eggEnergy>=200?"Bereit zum Erwecken":p.eggEnergy+" / "+EGG_MAX+" Energie";
   }
   async function sync(){
     const c=window.BuhrsiCloud;
@@ -202,7 +202,7 @@ window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.
  }
  function checkHatch(){
    const s=state(), energy=Number(s.eggEnergy??s.egg_energy)||0;
-   if(energy<100 || s.lastHatchAt) return;
+   if(energy<200 || s.lastHatchAt) return;
    showHatch();
  }
  function showHatch(){
@@ -434,7 +434,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  function rarityLabel(r){return ({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR"})[r]||r}
  function update(){
    const p=window.BuhrsiHatch?.profile?.();
-   if(btn)btn.hidden=!p || Number(p.egg_energy||0)<100;
+   if(btn)btn.hidden=!p || Number(p.egg_energy||0)<200;
  }
  setTimeout(update,600);
  window.addEventListener("buhrsi:child-change",update);

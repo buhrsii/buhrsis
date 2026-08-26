@@ -61,3 +61,4 @@ if("serviceWorker" in navigator){navigator.serviceWorker.addEventListener("messa
 try{const m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");reminderSb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});selectChild(readChild())}catch(e){console.error("Erinnerungen konnten nicht geladen werden",e)}
 
 import("./collection-fix.js").catch(e=>console.error("Sammlungs-Fix konnte nicht geladen werden",e));
+import("./egg-stages.js").catch(e=>console.error("Ei-Stufen konnten nicht geladen werden",e));

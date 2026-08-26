@@ -1,0 +1,9 @@
+.egg-art{overflow:visible;background:radial-gradient(circle at 50% 58%,rgba(83,48,170,.22),rgba(12,16,18,.15) 58%,transparent 72%)}
+.egg-stage-image{display:block;object-fit:contain;filter:drop-shadow(0 10px 24px rgba(61,44,184,.28));transform-origin:50% 72%;animation:eggStageFloat 3.6s ease-in-out infinite}
+.egg-stage-image-home{width:min(100%,180px);height:180px}
+.egg-v05-art{width:150px!important;height:180px!important;border-radius:0!important;background:none!important;box-shadow:none!important;display:grid;place-items:center;overflow:visible}
+.egg-stage-image-progress{width:150px;height:180px}
+.egg-stage-image[data-stage="1"]{animation:eggStageFloat 4.2s ease-in-out infinite,eggStageGlow1 3.2s ease-in-out infinite}
+@keyframes eggStageFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes eggStageGlow1{0%,100%{filter:drop-shadow(0 9px 20px rgba(74,49,210,.22)) brightness(.98)}50%{filter:drop-shadow(0 10px 30px rgba(109,71,255,.42)) brightness(1.04)}}
+@media(max-width:560px){.egg-stage-image-home{width:150px;height:150px}.egg-v05-art{width:138px!important;height:160px!important}.egg-stage-image-progress{width:138px;height:160px}}
