@@ -5,7 +5,7 @@ let reminderSb=null,currentChild=null,currentPin="";
 
 if(!document.querySelector('link[href="reminders.css"]')){const l=document.createElement("link");l.rel="stylesheet";l.href="reminders.css";document.head.appendChild(l)}
 function readChild(){try{return JSON.parse(localStorage.getItem("buhrsiChild")||"null")}catch(e){return null}}
-function readPin(){try{return sessionStorage.getItem("buhrsiChildPin")||""}catch(e){return ""}}
+function readPin(){try{return localStorage.getItem("buhrsiChildDeviceToken")||sessionStorage.getItem("buhrsiChildPin")||""}catch(e){return ""}}
 function args(extra={}){return {p_child:currentChild?.id,p_pin:currentPin||null,...extra}}
 function setStatus(text=""){const el=document.getElementById("reminderStatus028");if(el)el.textContent=text}
 function urlB64ToUint8Array(base64String){const padding="=".repeat((4-base64String.length%4)%4),base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(base64);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)))}
@@ -59,3 +59,5 @@ function selectChild(profile){currentChild=profile||readChild();currentPin=readP
 window.addEventListener("buhrsi:child-change",e=>selectChild(e.detail));
 if("serviceWorker" in navigator){navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="buhrsi:push-open"&&e.data?.startBrush)setTimeout(()=>document.getElementById("start")?.click(),250)})}
 try{const m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");reminderSb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});selectChild(readChild())}catch(e){console.error("Erinnerungen konnten nicht geladen werden",e)}
+
+import("./collection-fix.js").catch(e=>console.error("Sammlungs-Fix konnte nicht geladen werden",e));
