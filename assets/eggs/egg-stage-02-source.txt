@@ -1,1 +1,0 @@
-Ei-Stufe 2: hochauflösendes WebP wird im nächsten Commit als Binärasset ersetzt.
