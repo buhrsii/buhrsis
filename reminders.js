@@ -3,6 +3,7 @@ const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
 const VAPID_PUBLIC_KEY="BMAkLI2jWePft49ru40llM4CndEcPC_wsnGc0LuBIdTcuIacoIZ14cbPRhwGTH-vBfCTbt2kJxCymAZrCduJA2c";
 let reminderSb=null,currentChild=null,currentPin="";
 
+if(!document.querySelector('link[href="reminders.css"]')){const l=document.createElement("link");l.rel="stylesheet";l.href="reminders.css";document.head.appendChild(l)}
 function readChild(){try{return JSON.parse(localStorage.getItem("buhrsiChild")||"null")}catch(e){return null}}
 function readPin(){try{return sessionStorage.getItem("buhrsiChildPin")||""}catch(e){return ""}}
 function args(extra={}){return {p_child:currentChild?.id,p_pin:currentPin||null,...extra}}
