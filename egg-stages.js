@@ -3,7 +3,8 @@ const EGG_STAGE_ASSETS={
   4:"./assets/eggs/egg-stage-04.webp",
   5:"./assets/eggs/egg-stage-05.webp",
   6:"./assets/eggs/egg-stage-06.webp",
-  7:"./assets/eggs/egg-stage-07.webp"
+  7:"./assets/eggs/egg-stage-07.webp",
+  8:"./assets/eggs/egg-stage-08.webp"
 };
 
 function readEggEnergy(){
