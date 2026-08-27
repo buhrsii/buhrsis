@@ -659,6 +659,7 @@ window.addEventListener("load",()=>{
      }
      previous.xp=Math.max(Number(previous.xp)||0,Number(row.xp)||0);
      previous.streak=Math.max(Number(previous.streak)||0,Number(row.streak)||0);
+     previous.perfect_streak=Math.max(Number(previous.perfect_streak)||0,Number(row.perfect_streak)||0);
      previous.is_me=Boolean(previous.is_me||row.is_me);
    });
    const ranked=[...uniqueByName.values()].sort((a,b)=>(Number(b.xp)||0)-(Number(a.xp)||0)||a._sourceIndex-b._sourceIndex);
@@ -666,7 +667,7 @@ window.addEventListener("load",()=>{
      const el=document.createElement("div");el.className="leader-row0149"+(r.is_me?" me":"");
      const rank=i+1;
      const medal=rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"#"+rank;
-     el.innerHTML=`<b>${medal}</b><span><strong>${r.display_name}</strong><small>🔥 ${r.streak||0} Tage</small></span><em>${r.xp||0} XP</em>`;
+     el.innerHTML=`<b>${medal}</b><span><strong>${r.display_name}</strong><small>🔥 ${r.streak||0} Tage · ⭐ ${r.perfect_streak||0} perfekt</small></span><em>${r.xp||0} XP</em>`;
      box.append(el);
    });
  }
