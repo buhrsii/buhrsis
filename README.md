@@ -1,8 +1,15 @@
-# Buhrsi's v0.50 – Elternverwaltung
+# Buhrsi's v0.51 – Elternübersicht
 
 Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
 
-Neu in v0.50:
+Neu in v0.51:
+
+- eigener Elternbereich mit den Seiten **Übersicht** und **Verwalten**
+- Eltern sehen pro Kind Schule, Klasse, Notendurchschnitt, XP und den nächsten Schultermin
+- Kinderprofile und Schulinfos lassen sich direkt aus der Übersicht öffnen
+- Familien- und Kinderkontoeinstellungen liegen gesammelt auf der Verwalten-Seite
+
+Bereits seit v0.50:
 
 - Eltern gelangen bei jedem Kind direkt über **Schule & Noten bearbeiten** in die Schulverwaltung
 - der Organizer zeigt eindeutig Elternmodus oder Kindermodus an
