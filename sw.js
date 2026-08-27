@@ -1,4 +1,4 @@
-const CACHE = "buhrsis-v054-back-navigation";
+const CACHE = "buhrsis-v055-area-profile";
 const ASSETS = ["./","./index.html","./styles.css","./social.css","./reminders.css","./organizer.css","./egg-stages.css","./app.js","./cloud.js","./social.js","./reminders.js","./organizer.js","./egg-stages.js","./assets/eggs/egg-stage-01.webp","./assets/eggs/egg-stage-02.webp","./assets/eggs/egg-stage-03.webp","./assets/eggs/egg-stage-04.webp","./assets/eggs/egg-stage-05.webp","./assets/eggs/egg-stage-06.webp","./assets/eggs/egg-stage-07.webp","./assets/eggs/egg-stage-08.webp","./assets/eggs/egg-stage-09.webp","./assets/eggs/egg-stage-10.webp","./assets/buhrsis/moxu-toothbrush-celebrate.webp","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-moxu-192.png","./icon-moxu-512.png"];
 
 self.addEventListener("install", event => {

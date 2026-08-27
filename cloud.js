@@ -8,7 +8,7 @@ const safe=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"
 const FAMILY_EMOJIS=["👨‍👩‍👧‍👦","🏡","❤️","🌟","🐻","🦊","🐼","🦁","🌈","🚀"];
 function initials(name){const first=String(name||"").trim().match(/\p{L}/u)?.[0]||"K",familyWords=String(family?.name||"Buhrs").match(/\p{L}+/gu)||["Buhrs"],last=familyWords.at(-1)?.[0]||"B";return `${first}${last}`.toUpperCase()}
 function choose(p,isChild=false){
- child=p;childModeSession=isChild;$("#profileName").textContent=p.name;document.querySelector(".top .avatar").textContent=initials(p.name);
+ child=p;childModeSession=isChild;const profileInitials=initials(p.name);$("#profileName").textContent=p.name;document.querySelector(".top .avatar").textContent=profileInitials;$("#areaProfileName").textContent=p.name;$("#areaAvatar").textContent=profileInitials;
  try{
    localStorage.setItem("buhrsiChild",JSON.stringify(p));
    localStorage.setItem("buhrsiChildMode",isChild?"1":"0");
