@@ -252,14 +252,15 @@ window.BuhrsiOrganizerAPI={
    if(error){console.error("organizer snapshot",error);throw error}return data;
  },
  async save(table,row,upsert=false){
-   const allowed=new Set(["school_profiles","school_subjects","school_teachers","school_timetable","school_events","home_tasks"]);
+   const allowed=new Set(["school_profiles","school_subjects","school_teachers","school_timetable","school_schedule_entries","school_events","home_tasks"]);
    if(!this.isParent()||!allowed.has(table))throw new Error("Nur Eltern dürfen diese Angaben ändern.");
    const payload={...row,child_id:child.id};
-   const query=upsert?sb.from(table).upsert(payload):sb.from(table).insert(payload);
+   const conflicts={school_profiles:"child_id",school_timetable:"child_id,weekday,period",school_schedule_entries:"child_id,period"};
+   const query=upsert?sb.from(table).upsert(payload,{onConflict:conflicts[table]||"id"}):sb.from(table).insert(payload);
    const {data,error}=await query.select().single();if(error)throw error;return data;
  },
  async remove(table,id){
-   const allowed=new Set(["school_subjects","school_teachers","school_timetable","school_events","home_tasks"]);
+   const allowed=new Set(["school_subjects","school_teachers","school_timetable","school_schedule_entries","school_events","home_tasks"]);
    if(!this.isParent()||!allowed.has(table))throw new Error("Nur Eltern dürfen Einträge löschen.");
    const {error}=await sb.from(table).delete().eq("id",id).eq("child_id",child.id);if(error)throw error;
  },
