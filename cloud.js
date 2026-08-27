@@ -34,9 +34,12 @@ async function profiles(){
    card.innerHTML=`<div class="profile-info-v154"><b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small></div>`;
    const start=document.createElement("button");start.type="button";start.className="child-start-v154";start.textContent="ÖFFNEN";
    start.onclick=e=>{e.preventDefault();e.stopPropagation();choose(p,false)};
+   const school=document.createElement("button");school.type="button";school.className="child-school-v050";school.textContent="SCHULE & NOTEN BEARBEITEN";
+   school.onclick=e=>{e.preventDefault();e.stopPropagation();choose(p,false);setTimeout(()=>window.BuhrsiOrganizer?.open?.("manage"),60)};
    const admin=document.createElement("button");admin.type="button";admin.className="child-admin-v154";admin.textContent="VERWALTEN";
    admin.onclick=e=>{e.preventDefault();e.stopPropagation();window.openParentAdmin010?.(p)};
-   card.append(start,admin);list.append(card);
+   admin.textContent="KINDERKONTO";
+   card.append(school,start,admin);list.append(card);
  });
 }
 async function afterParentLogin(){
@@ -53,6 +56,8 @@ $("#unifiedLoginForm").onsubmit=async e=>{
  e.preventDefault();msg();
  const identity=$("#loginIdentity").value.trim(),secret=$("#loginSecret").value;
  if(identity.includes("@")){
+   try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");localStorage.removeItem("buhrsiChildDeviceToken");sessionStorage.removeItem("buhrsiChildPin")}catch(e){}
+   child=null;childPin="";childModeSession=false;
    const {data,error}=await sb.auth.signInWithPassword({email:identity,password:secret});
    if(error)return msg("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");
    user=data.user;await afterParentLogin();return;

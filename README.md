@@ -1,8 +1,14 @@
-# Buhrsi's v0.48 – Verlässliche Navigation
+# Buhrsi's v0.50 – Elternverwaltung
 
 Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
 
-Neu in v0.48:
+Neu in v0.50:
+
+- Eltern gelangen bei jedem Kind direkt über **Schule & Noten bearbeiten** in die Schulverwaltung
+- der Organizer zeigt eindeutig Elternmodus oder Kindermodus an
+- die E-Mail-Anmeldung beendet zuverlässig einen eventuell gespeicherten Kindermodus
+
+Bereits seit v0.48:
 
 - abgelaufene Kinder-Sitzungen führen sicher zurück zur Anmeldung statt auf eine leere Seite
 - Familien-Emoji und Familienname werden sichtbar zusammen angezeigt
