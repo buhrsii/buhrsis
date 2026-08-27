@@ -1,8 +1,14 @@
-# Buhrsi's v0.45 – Familiengruppen
+# Buhrsi's v0.46 – Familienprofil
 
 Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
 
-Neu in v0.45:
+Neu in v0.46:
+
+- Familien lassen sich benennen und mit einem Emoji kennzeichnen
+- alle angemeldeten Eltern der Familie dürfen diese Einstellungen bearbeiten
+- Emil wurde ohne Verlust seines Profils in die gemeinsame Familie übernommen
+
+Bereits seit v0.45:
 
 - Eltern registrieren sich mit einem eigenen Elternkonto
 - ein Elternteil erstellt eine Familiengruppe
@@ -24,4 +30,4 @@ Bereits seit v0.44:
 - Elternaufgaben für daheim mit frei wählbarer XP-Belohnung
 - private Lehrerkontaktdaten bleiben im Elternzugang
 
-Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql` und `supabase-v045-family-groups.sql`.
+Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql`, `supabase-v045-family-groups.sql` und `supabase-v046-family-customization.sql`.

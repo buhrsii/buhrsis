@@ -5,6 +5,7 @@ const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"
 function show(id){["roleView","childLoginView","authView","familyView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
 function app(on){$("#authGate").hidden=on;$(".app").hidden=!on}
 const safe=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const FAMILY_EMOJIS=["👨‍👩‍👧‍👦","🏡","❤️","🌟","🐻","🦊","🐼","🦁","🌈","🚀"];
 function choose(p,isChild=false){
  child=p;childModeSession=isChild;$("#profileName").textContent=p.name;
  try{
@@ -24,8 +25,9 @@ async function profiles(){
  if(heading)heading.textContent=isAdmin?"Alle Profile verwalten":"Profile verwalten";
  if(eyebrow)eyebrow.textContent=isAdmin?"ADMINISTRATION":"FAMILIE";
  const summary=$("#familySummary");
- if(summary)summary.innerHTML=family?`<div><small>FAMILIENGRUPPE</small><b>${safe(family.name)}</b><span>${(family.adults||[]).length} Elternzugang${(family.adults||[]).length===1?"":"e"}</span></div><div><small>CODE FÜR WEITERE ELTERN</small><button type="button" id="copyFamilyCode">${safe(family.invite_code)} · KOPIEREN</button></div><p>${(family.adults||[]).map(a=>safe(a.email||"Elternteil")+(a.role==="owner"?" (Ersteller)":"")).join(" · ")}</p>`:"";
+ if(summary)summary.innerHTML=family?`<div class="family-identity"><span class="family-emoji" aria-hidden="true">${safe(family.emoji||FAMILY_EMOJIS[0])}</span><div><small>FAMILIENGRUPPE</small><b>${safe(family.name)}</b><span>${(family.adults||[]).length} Elternzugang${(family.adults||[]).length===1?"":"e"}</span></div></div><div><small>CODE FÜR WEITERE ELTERN</small><button type="button" id="copyFamilyCode">${safe(family.invite_code)} · KOPIEREN</button></div><form id="familySettingsForm" class="family-settings"><label><small>FAMILIENNAME</small><input id="editFamilyName" maxlength="60" required value="${safe(family.name)}"></label><label><small>EMOJI</small><select id="editFamilyEmoji" aria-label="Familien-Emoji">${FAMILY_EMOJIS.map(emoji=>`<option value="${emoji}"${emoji===(family.emoji||FAMILY_EMOJIS[0])?" selected":""}>${emoji}</option>`).join("")}</select></label><button type="submit">SPEICHERN</button></form><p>${(family.adults||[]).map(a=>safe(a.email||"Elternteil")+(a.role==="owner"?" (Ersteller)":"")).join(" · ")}</p>`:"";
  $("#copyFamilyCode")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(family.invite_code);msg("Familiencode kopiert.")}catch(e){msg("Familiencode: "+family.invite_code)}});
+ $("#familySettingsForm")?.addEventListener("submit",async e=>{e.preventDefault();msg();const button=e.submitter;button.disabled=true;const {data,error}=await sb.rpc("buhrsi_family_update",{p_name:$("#editFamilyName").value.trim(),p_emoji:$("#editFamilyEmoji").value});button.disabled=false;if(error)return msg(error.message);family=data;msg("Familie gespeichert.");await profiles()});
  const list=$("#profileList");list.innerHTML="";
  (data||[]).forEach(p=>{
    const card=document.createElement("div");card.className="profile-choice profile-choice-v154";
