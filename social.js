@@ -3,7 +3,7 @@ const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
 let socialSb=null,currentChild=null,currentPin="",pollTimer=null,lastLiveIds=new Set();
 
 function readChild(){try{return JSON.parse(localStorage.getItem("buhrsiChild")||"null")}catch(e){return null}}
-function readPin(){try{return sessionStorage.getItem("buhrsiChildPin")||""}catch(e){return ""}}
+function readPin(){try{return localStorage.getItem("buhrsiChildDeviceToken")||sessionStorage.getItem("buhrsiChildPin")||""}catch(e){return ""}}
 function rpcArgs(extra={}){return {p_child:currentChild?.id,p_pin:currentPin||null,...extra}}
 function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
 

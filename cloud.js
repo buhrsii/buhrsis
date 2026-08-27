@@ -103,6 +103,7 @@ try{
    if(childPin.length>4){
      const {data,error}=await sb.rpc("buhrsi_restore_child_device_session",{p_token:childPin});
      if(!error&&data?.length)choose(data[0],true);
+     else if(error){try{choose(JSON.parse(saved),true);msg("Verbindung wird wiederhergestellt. Das Profil bleibt angemeldet.")}catch(e){app(false);show("roleView")}}
      else{try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");localStorage.removeItem("buhrsiChildDeviceToken");sessionStorage.removeItem("buhrsiChildPin")}catch(e){}childPin="";app(false);show("roleView");msg("Die Kinder-Sitzung ist abgelaufen. Bitte erneut anmelden.")}
    }else{
      try{choose(JSON.parse(saved),true)}catch(e){localStorage.removeItem("buhrsiChild");app(false);show("roleView")}
