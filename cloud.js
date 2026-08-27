@@ -15,35 +15,50 @@ function choose(p,isChild=false){
  window.dispatchEvent(new CustomEvent("buhrsi:child-change",{detail:p}));
 }
 async function profiles(){
- let {data,error}=await sb.from("child_profiles").select("id,name,username,buhrsi_code,xp,gloss,streak,egg_energy").order("created_at");
+ let {data,error}=await sb.from("child_profiles").select("id,parent_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").order("created_at");
  if(error)return msg(error.message);
  show("profileView");
+ const isAdmin=Boolean(user?.app_metadata?.buhrsi_admin);
+ const heading=$("#profileHeading"),eyebrow=$("#profileEyebrow");
+ if(heading)heading.textContent=isAdmin?"Alle Profile verwalten":"Profile verwalten";
+ if(eyebrow)eyebrow.textContent=isAdmin?"ADMINISTRATION":"PROFILE";
  const list=$("#profileList");list.innerHTML="";
  (data||[]).forEach(p=>{
    const card=document.createElement("div");card.className="profile-choice profile-choice-v154";
    card.innerHTML=`<div class="profile-info-v154"><b>${p.name}</b><small>@${p.username||"noch-ohne-login"} · ${p.buhrsi_code||""}</small></div>`;
-   const start=document.createElement("button");start.type="button";start.className="child-start-v154";start.textContent="ALS KIND STARTEN";
+   const start=document.createElement("button");start.type="button";start.className="child-start-v154";start.textContent="ÖFFNEN";
    start.onclick=e=>{e.preventDefault();e.stopPropagation();choose(p,false)};
    const admin=document.createElement("button");admin.type="button";admin.className="child-admin-v154";admin.textContent="VERWALTEN";
    admin.onclick=e=>{e.preventDefault();e.stopPropagation();window.openParentAdmin010?.(p)};
    card.append(start,admin);list.append(card);
  });
 }
-$("#childMode").onclick=()=>{msg();show("childLoginView")}; $("#parentMode").onclick=()=>{msg();show("authView")};
+$("#openSignup").onclick=()=>{msg();show("authView")};
 document.querySelectorAll(".back-auth").forEach(b=>b.onclick=()=>{msg();show("roleView")});
-$("#childLoginForm").onsubmit=async e=>{
+$("#unifiedLoginForm").onsubmit=async e=>{
  e.preventDefault();msg();
- const pin=$("#childPinLogin").value;
- let {data,error}=await sb.rpc("verify_child_pin",{p_username:$("#childUsernameLogin").value.trim(),p_pin:pin});
- if(error)return msg(error.message);if(!data?.length)return msg("Name oder PIN stimmt nicht.");
- let credential=pin;
- const sessionRes=await sb.rpc("buhrsi_create_child_device_session",{p_child:data[0].id,p_pin:pin});
+ const identity=$("#loginIdentity").value.trim(),secret=$("#loginSecret").value;
+ if(identity.includes("@")){
+   const {data,error}=await sb.auth.signInWithPassword({email:identity,password:secret});
+   if(error)return msg("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");
+   user=data.user;await profiles();return;
+ }
+ if(!/^\d{4}$/.test(secret))return msg("Für einen Benutzernamen wird eine 4-stellige PIN benötigt.");
+ let {data,error}=await sb.rpc("verify_child_pin",{p_username:identity,p_pin:secret});
+ if(error||!data?.length)return msg("Benutzername oder PIN stimmt nicht.");
+ let credential=secret;
+ const sessionRes=await sb.rpc("buhrsi_create_child_device_session",{p_child:data[0].id,p_pin:secret});
  if(!sessionRes.error&&sessionRes.data){credential=sessionRes.data;try{localStorage.setItem("buhrsiChildDeviceToken",credential)}catch(e){}}
- childPin=credential;
- try{sessionStorage.setItem("buhrsiChildPin",credential)}catch(e){}
- choose(data[0],true)
+ childPin=credential;try{sessionStorage.setItem("buhrsiChildPin",credential)}catch(e){}
+ choose(data[0],true);
 };
-$("#authForm").onsubmit=async e=>{e.preventDefault();msg();let email=$("#email").value.trim(),password=$("#password").value,mode=e.submitter.dataset.mode;if(mode==="signup"){let {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(error)return msg(error.message);return msg("Konto erstellt. Bitte E-Mail bestätigen.")}let {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg("Anmeldung fehlgeschlagen: "+error.message);user=data.user;await profiles()};
+$("#authForm").onsubmit=async e=>{
+ e.preventDefault();msg();
+ const email=$("#email").value.trim(),password=$("#password").value;
+ const {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});
+ if(error)return msg(error.message);
+ msg("Konto erstellt. Bitte E-Mail bestätigen.");
+};
 $("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("create_child_account",{p_name:$("#childName").value.trim(),p_username:$("#childUsername").value.trim(),p_pin:$("#childPin").value});if(error)return msg(error.message);$("#childForm").reset();await profiles()};
 $("#logoutBtn").onclick=async()=>{
  const token=(()=>{try{return localStorage.getItem("buhrsiChildDeviceToken")||""}catch(e){return ""}})();
@@ -80,7 +95,7 @@ async function openChildSelector(){
    user=data.session?.user||null;
  }
  if(user)await profiles();
- else show("childLoginView");
+ else show("roleView");
 }
 window.BuhrsiAuth={openChildSelector};
 window.BuhrsiCloud={get child(){return child},async saveProgress(p){if(!sb||!child||childModeSession)return {ok:false};let {data,error}=await sb.from("child_profiles").update({xp:+p.xp||0,gloss:Math.max(0,Math.min(100,+p.gloss||0)),streak:+p.streak||0,egg_energy:+p.eggEnergy||0}).eq("id",child.id).select().single();if(!error)child=data;return {ok:!error,data,error}},async logBrush(){}};
@@ -114,6 +129,15 @@ window.BuhrsiStreaks={
 };
 
 window.BuhrsiAdmin={
+ isAdmin(){return Boolean(user?.app_metadata?.buhrsi_admin)},
+ async setProgress(id,xp,streak){
+   if(!this.isAdmin())return {ok:false,reason:"admin-required"};
+   const cleanXp=Math.max(0,Math.min(1000000,Math.trunc(Number(xp)||0)));
+   const cleanStreak=Math.max(0,Math.min(9999,Math.trunc(Number(streak)||0)));
+   const {data,error}=await sb.from("child_profiles").update({xp:cleanXp,streak:cleanStreak}).eq("id",id).select("id,parent_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").single();
+   if(!error&&child&&String(child.id)===String(id)){child={...child,...data};try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}}
+   return {ok:!error,error,data};
+ },
  async resetProgress(id){
    const {error}=await sb.rpc("reset_child_progress",{p_child:id});
    if(!error&&child&&String(child.id)===String(id)){

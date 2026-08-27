@@ -419,9 +419,21 @@ document.addEventListener("DOMContentLoaded",()=>{
 // v0.10 parent administration
 (function(){
  let selected=null;const modal=document.getElementById("parentAdmin010"),msg=document.getElementById("adminMsg010");
- window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");msg.textContent="";modal.hidden=false};
+ window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");const edit=document.getElementById("adminProgress041");const isAdmin=Boolean(window.BuhrsiAdmin?.isAdmin?.());if(edit)edit.hidden=!isAdmin;const xp=document.getElementById("adminXp041"),streak=document.getElementById("adminStreak041");if(xp)xp.value=Number(p.xp)||0;if(streak)streak.value=Number(p.streak)||0;msg.textContent="";modal.hidden=false};
  const close=()=>{modal.hidden=true;selected=null};
  document.getElementById("adminClose010")?.addEventListener("click",close);
+ document.getElementById("saveProgressAdmin041")?.addEventListener("click",async event=>{
+   if(!selected||!window.BuhrsiAdmin?.isAdmin?.())return;
+   const button=event.currentTarget,xp=document.getElementById("adminXp041")?.value,streak=document.getElementById("adminStreak041")?.value;
+   button.disabled=true;msg.textContent="Werte werden gespeichert …";
+   const r=await window.BuhrsiAdmin.setProgress(selected.id,xp,streak);
+   button.disabled=false;
+   if(!r.ok){msg.textContent="Speichern fehlgeschlagen: "+(r.error?.message||"Keine Berechtigung");return}
+   selected={...selected,...r.data};
+   window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:selected}));
+   await window.BuhrsiAdmin.reload();await window.refreshLeaderboard?.();
+   msg.textContent="XP und Streak wurden gespeichert.";
+ });
  document.getElementById("resetPin010")?.addEventListener("click",async()=>{if(!selected)return;let pin=prompt("Neue 4-stellige PIN:");if(!/^\d{4}$/.test(pin||""))return msg.textContent="Bitte genau 4 Ziffern eingeben.";let r=await window.BuhrsiAdmin.resetPin(selected.id,pin);msg.textContent=r.ok?"PIN wurde geändert.":"PIN konnte nicht geändert werden."});
  document.getElementById("resetProgress010")?.addEventListener("click",async event=>{
    if(!selected||!confirm("Spielstand wirklich zurücksetzen? XP, Streaks, Ei und Sammlung werden gelöscht."))return;

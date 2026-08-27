@@ -1,21 +1,19 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0e0f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Buhrsi's"><link rel="apple-touch-icon" href="icon-moxu-192.png"><title>Buhrsi's</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="social.css"><link rel="stylesheet" href="reminders.css"></head><body><section id="authGate" class="auth-gate"><div class="auth-card">
 <div class="auth-brand"><span>B</span><strong>Buhrsi’s</strong></div>
-<div id="roleView"><p class="eyebrow">WILLKOMMEN</p><h1>Schon ein Konto?</h1>
-<p class="auth-copy">Ein bestehendes Kinderkonto kannst du auch auf einem neuen Gerät benutzen.</p>
-<button id="childMode" class="role-btn" type="button">🔑 <b>KINDERKONTO ANMELDEN</b><small>Mit Benutzername und 4-stelliger PIN</small></button>
-<button id="parentMode" class="role-btn" type="button">⚙️ <b>ELTERNBEREICH</b><small>Kinder verwalten oder ein neues Kinderkonto anlegen</small></button></div>
-<div id="childLoginView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">VORHANDENES KINDERKONTO</p><h1>Als Kind einloggen</h1>
-<p class="auth-copy">Benutze denselben Benutzernamen und dieselbe PIN – auch auf einem neuen Gerät.</p>
-<form id="childLoginForm"><label>Buhrsi-Benutzername<input id="childUsernameLogin" maxlength="20" autocomplete="username" required></label>
-<label>4-stellige PIN<input id="childPinLogin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label>
-<button class="primary" type="submit">KINDERKONTO ANMELDEN</button></form></div>
-<div id="authView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">ELTERNBEREICH</p><h1>Elternkonto</h1>
-<p class="auth-copy">Hier kannst du Kinder verwalten oder ein neues Kinderkonto anlegen.</p>
-<form id="authForm"><label>E-Mail<input id="email" type="email" autocomplete="email" required></label><label>Passwort<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
-<button class="primary" data-mode="login" type="submit">ELTERNKONTO ANMELDEN</button><button class="secondary" data-mode="signup" type="submit">ELTERNKONTO ERSTELLEN</button></form></div>
-<div id="profileView" hidden><p class="eyebrow">ELTERNBEREICH</p><h1>Kinderkonten</h1><div id="profileList"></div>
-<form id="childForm"><label>Name<input id="childName" maxlength="30" required></label><label>Buhrsi-Benutzername<input id="childUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" required></label>
-<label>4-stellige PIN<input id="childPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label><button class="primary" type="submit">KINDERKONTO ANLEGEN</button></form></div>
+<div id="roleView"><p class="eyebrow">WILLKOMMEN</p><h1>Anmelden</h1>
+<p class="auth-copy">Melde dich mit deiner E-Mail und deinem Passwort oder mit Benutzername und PIN an.</p>
+<form id="unifiedLoginForm"><label>E-Mail oder Benutzername<input id="loginIdentity" autocomplete="username" required></label>
+<label>Passwort oder PIN<input id="loginSecret" type="password" autocomplete="current-password" required></label>
+<button class="primary" type="submit">ANMELDEN</button></form>
+<button id="openSignup" class="secondary auth-create-account" type="button">NEUES KONTO ERSTELLEN</button></div>
+<div id="childLoginView" hidden></div>
+<div id="authView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">NEUES KONTO</p><h1>Konto erstellen</h1>
+<p class="auth-copy">Erstelle ein Konto, um eigene Profile zu verwalten.</p>
+<form id="authForm"><label>E-Mail<input id="email" type="email" autocomplete="email" required></label><label>Passwort<input id="password" type="password" autocomplete="new-password" minlength="6" required></label>
+<button class="primary" data-mode="signup" type="submit">KONTO ERSTELLEN</button></form></div>
+<div id="profileView" hidden><p class="eyebrow" id="profileEyebrow">PROFILE</p><h1 id="profileHeading">Profile verwalten</h1><div id="profileList"></div>
+<form id="childForm"><label>Name<input id="childName" maxlength="30" required></label><label>Benutzername<input id="childUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" required></label>
+<label>4-stellige PIN<input id="childPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label><button class="primary" type="submit">PROFIL ANLEGEN</button></form></div>
 <p id="cloudMessage" class="cloud-message"></p></div></section><main class="app">
 <header class="top"><div class="profile"><div class="avatar">B</div><b id="profileName">Buhrsi’s</b></div><div class="currencies"><span>⭐ <b id="xpTop">0</b> XP</span><span>✨ <b id="glanzHome">0</b></span></div><button id="logoutBtn" class="logout-btn" type="button">Abmelden</button></header>
 <section class="hero card" id="homeSection"><div class="hero-copy"><p class="eyebrow">LOS GEHT'S! ✦</p><h1>Putze deine Zähne</h1><div class="timer" id="timer"><span id="time">02:00</span><small id="zone">Bereit?</small></div></div><div class="creature-wrap"><img class="home-buhrsi-image" id="creature" src="assets/buhrsis/moxu.png" alt="Moxu" decoding="async" fetchpriority="high"><button class="primary" id="start">🪥 PUTZEN STARTEN</button></div></section>
@@ -53,8 +51,13 @@
 </section><section id="parentAdmin010" class="admin010" hidden>
 <div class="admin010-card"><button type="button" id="startChildAdmin0154" class="admin-start-v154">ALS KIND STARTEN</button>
 <button id="adminClose010" class="admin010-close" type="button">×</button>
-<span class="eyebrow">ELTERNBEREICH</span><h2 id="adminName010">Kinderkonto</h2>
+<span class="eyebrow">PROFILVERWALTUNG</span><h2 id="adminName010">Profil</h2>
 <p id="adminMeta010"></p>
+<div id="adminProgress041" class="admin-progress041" hidden>
+<label>XP<input id="adminXp041" type="number" min="0" max="1000000" inputmode="numeric"></label>
+<label>Streak<input id="adminStreak041" type="number" min="0" max="9999" inputmode="numeric"></label>
+<button id="saveProgressAdmin041" type="button">XP &amp; STREAK SPEICHERN</button>
+</div>
 <div class="admin-actions010">
 <button id="resetPin010" type="button">PIN ändern</button>
 <button id="resetProgress010" type="button">Spielstand zurücksetzen</button>

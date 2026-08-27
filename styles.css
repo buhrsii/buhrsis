@@ -309,3 +309,12 @@ nav button{cursor:pointer;touch-action:manipulation}
   100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}
 }
 @media(prefers-reduced-motion:reduce){.reward.open .reward-buhrsi{animation:none}}
+
+
+/* v0.42 unified sign-in and protected admin progress editor */
+.auth-create-account{width:100%;margin-top:10px}
+.admin-progress041{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0;padding:14px;border:1px solid #3b4342;border-radius:16px;background:#191f20}
+.admin-progress041[hidden]{display:none}
+.admin-progress041 label{display:grid;gap:6px;color:#aeb6b3;font-size:12px;font-weight:800}
+.admin-progress041 input{width:100%;box-sizing:border-box;min-height:46px;border:1px solid #3b4342;border-radius:12px;background:#101415;color:#fff;padding:10px;font-size:17px}
+.admin-progress041 button{grid-column:1/-1;min-height:48px;border:0;border-radius:12px;background:#f6bd55;color:#17191a;font-weight:900}
