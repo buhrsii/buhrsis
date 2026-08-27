@@ -1,8 +1,14 @@
-# Buhrsi's v0.47 – Schulen und Stundenplan
+# Buhrsi's v0.48 – Verlässliche Navigation
 
 Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
 
-Neu in v0.47:
+Neu in v0.48:
+
+- abgelaufene Kinder-Sitzungen führen sicher zurück zur Anmeldung statt auf eine leere Seite
+- Familien-Emoji und Familienname werden sichtbar zusammen angezeigt
+- die Schule/Daheim-Auswahl und der Schulbereich haben einen direkten Rückweg zur Anmeldung
+
+Bereits seit v0.47:
 
 - jedes Kinderprofil besitzt ein vollständig getrenntes Schulprofil
 - Schulen können über die offene JedeSchule-Datenbank gesucht oder manuell eingetragen werden
