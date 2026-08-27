@@ -281,3 +281,12 @@ body:not(.locked) #hatchV06[hidden]{z-index:-1!important}
 .home-buhrsi-image{display:block;width:240px;height:240px;object-fit:contain;filter:drop-shadow(0 18px 24px #0009)}
 nav button{cursor:pointer;touch-action:manipulation}
 @media(max-width:650px){.home-buhrsi-image{width:170px;height:170px}}
+
+.home-collection-empty,.home-collection-discovered{margin-top:18px;min-height:170px;border:1px dashed #3a4141;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:22px;padding:18px;color:#b7bfbd}
+.home-collection-empty img{width:105px;height:135px;object-fit:contain;filter:brightness(0) drop-shadow(0 0 18px rgba(154,115,255,.3));opacity:.5}
+.home-collection-empty b,.home-collection-discovered b{display:block;color:#f2ede4;font-size:17px;margin-bottom:6px}
+.home-collection-empty p,.home-collection-discovered p{margin:0;color:#9fa8a5}
+.home-collection-discovered img{width:115px;height:145px;object-fit:contain}
+.collection .section-title>span{color:#9fa8a5;font-size:13px}
+.collection .hatch-now011{margin-top:14px}
+@media(max-width:560px){.home-collection-empty,.home-collection-discovered{justify-content:flex-start;gap:14px}.home-collection-empty img,.home-collection-discovered img{width:88px;height:115px}}

@@ -12,7 +12,7 @@ const zones=[
 function save(){localStorage.setItem('buhrsiState',JSON.stringify(state))}
 function render(){
  const lvl=Math.floor(state.xp/200)+1,into=state.xp%200;
- $('#xpTop').textContent=state.xp;$('#level').textContent=lvl;$('#miniLevel').textContent=lvl;
+ $('#xpTop').textContent=state.xp;$('#level').textContent=lvl;
  $('#xpBar').style.width=(into/2)+'%';$('#xpToNext').textContent=into;
  const egg=Math.min(state.eggEnergy||0,200);$('#eggXp').textContent=egg;$('#eggBar').style.width=(egg/2)+'%';
  $('#streak').textContent=state.streak;$('#glanzHome').textContent=state.glanz;
@@ -272,13 +272,6 @@ window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.
    const entry=catalogEntry(row);
    if(entry&&!owned.has(entry.variant))owned.set(entry.variant,row);
   });
-  const profile=window.BuhrsiHatch?.profile?.()||{};
-  if(!owned.has("kuro")){
-   owned.set("kuro",{
-    species:"Kuro",variant:"kuro",rarity:"NEUTRAL",current_value:0,
-    bond:50,gloss:numberOr(profile.gloss,50),is_companion:true
-   });
-  }
   return owned;
  }
 
@@ -346,6 +339,20 @@ window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.
  function renderCollection(rows){
   if(!grid)return;
   const owned=ownedByVariant(rows);
+  const homeCount=document.getElementById("homeCollectionCount");
+  const homePreview=document.getElementById("homeCollectionPreview");
+  if(homeCount)homeCount.textContent=owned.size+" entdeckt";
+  if(homePreview){
+   const first=[...owned.entries()][0];
+   if(!first){
+    homePreview.className="home-collection-empty";
+    homePreview.innerHTML='<img src="assets/buhrsis/moxu.png" alt="" aria-hidden="true"><div><b>Noch kein Buhrsi entdeckt</b><p>Dein erstes Buhrsi wartet im Ei.</p></div>';
+   }else{
+    const [variant,row]=first,entry=byVariant.get(variant);
+    homePreview.className="home-collection-discovered";
+    homePreview.innerHTML='<img src="'+entry.image+'" alt="'+entry.species+'"><div><b>'+entry.species+'</b><p>'+rarityLabel(entry.rarity||row?.rarity)+'</p></div>';
+   }
+  }
   grid.innerHTML="";
   BUHRSI_CATALOG.forEach(entry=>grid.append(createCard(entry,owned.get(entry.variant))));
   if(count)count.textContent=`${owned.size} / ${BUHRSI_CATALOG.length} entdeckt`;
