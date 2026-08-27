@@ -14,7 +14,7 @@ function openHome(){chooser.hidden=true;screen.hidden=true;document.body.classLi
 async function openSchool(){chooser.hidden=true;screen.hidden=false;document.body.classList.add("school-mode");window.scrollTo(0,0);await load()}
 function setTab(tab){activeTab=tab;document.querySelectorAll(".organizer-tabs button").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab))}
 chooser?.addEventListener("click",e=>{const area=e.target.closest("[data-area]")?.dataset.area;if(area==="school")openSchool();if(area==="home")openHome()});
-$("#organizerBack")?.addEventListener("click",openChooser);$("#organizerRefresh")?.addEventListener("click",load);$("#organizerLogout")?.addEventListener("click",()=>window.BuhrsiAuth?.logout?.());$("#areaLogout")?.addEventListener("click",()=>window.BuhrsiAuth?.logout?.());
+$("#organizerBack")?.addEventListener("click",openChooser);$("#organizerRefresh")?.addEventListener("click",load);$("#areaLogout")?.addEventListener("click",()=>window.BuhrsiAuth?.logout?.());
 document.querySelector(".organizer-tabs")?.addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;activeTab=b.dataset.tab;document.querySelectorAll(".organizer-tabs button").forEach(x=>x.classList.toggle("active",x===b));render()});
 window.addEventListener("buhrsi:child-change",()=>setTimeout(openChooser,0));
 setTimeout(()=>{if(window.BuhrsiOrganizerAPI?.child())openChooser()},700);
