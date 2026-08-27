@@ -1,8 +1,17 @@
-# Buhrsi's v0.44 – Kids-Organizer
+# Buhrsi's v0.45 – Familiengruppen
 
 Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
 
-Neu in v0.44:
+Neu in v0.45:
+
+- Eltern registrieren sich mit einem eigenen Elternkonto
+- ein Elternteil erstellt eine Familiengruppe
+- weitere Eltern treten mit einem achtstelligen Familiencode bei
+- alle Eltern der Familie können die zugehörigen Kinder verwalten
+- vorhandene Kinder werden automatisch und ohne Datenverlust übernommen
+- Kinder sehen weder Familiencode noch Lehrerkontaktdaten oder Elternverwaltung
+
+Bereits seit v0.44:
 
 - Startauswahl zwischen **Schule** und **Daheim**
 - Schulprofil mit Schule, Schulart, Klasse, Klassenstufe, Schuljahr und Bundesland
@@ -15,4 +24,4 @@ Neu in v0.44:
 - Elternaufgaben für daheim mit frei wählbarer XP-Belohnung
 - private Lehrerkontaktdaten bleiben im Elternzugang
 
-Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql`.
+Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql` und `supabase-v045-family-groups.sql`.

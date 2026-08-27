@@ -1,9 +1,10 @@
 const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co"; const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
-let sb,user,child,childModeSession=false,childPin="";
+let sb,user,child,family,childModeSession=false,childPin="";
 try{childPin=localStorage.getItem("buhrsiChildDeviceToken")||sessionStorage.getItem("buhrsiChildPin")||""}catch(e){}
 const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"";
-function show(id){["roleView","childLoginView","authView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
+function show(id){["roleView","childLoginView","authView","familyView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
 function app(on){$("#authGate").hidden=on;$(".app").hidden=!on}
+const safe=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function choose(p,isChild=false){
  child=p;childModeSession=isChild;$("#profileName").textContent=p.name;
  try{
@@ -15,13 +16,16 @@ function choose(p,isChild=false){
  window.dispatchEvent(new CustomEvent("buhrsi:child-change",{detail:p}));
 }
 async function profiles(){
- let {data,error}=await sb.from("child_profiles").select("id,parent_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").order("created_at");
+ let {data,error}=await sb.from("child_profiles").select("id,parent_id,family_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").order("created_at");
  if(error)return msg(error.message);
  show("profileView");
  const isAdmin=Boolean(user?.app_metadata?.buhrsi_admin);
  const heading=$("#profileHeading"),eyebrow=$("#profileEyebrow");
  if(heading)heading.textContent=isAdmin?"Alle Profile verwalten":"Profile verwalten";
- if(eyebrow)eyebrow.textContent=isAdmin?"ADMINISTRATION":"PROFILE";
+ if(eyebrow)eyebrow.textContent=isAdmin?"ADMINISTRATION":"FAMILIE";
+ const summary=$("#familySummary");
+ if(summary)summary.innerHTML=family?`<div><small>FAMILIENGRUPPE</small><b>${safe(family.name)}</b><span>${(family.adults||[]).length} Elternzugang${(family.adults||[]).length===1?"":"e"}</span></div><div><small>CODE FÜR WEITERE ELTERN</small><button type="button" id="copyFamilyCode">${safe(family.invite_code)} · KOPIEREN</button></div><p>${(family.adults||[]).map(a=>safe(a.email||"Elternteil")+(a.role==="owner"?" (Ersteller)":"")).join(" · ")}</p>`:"";
+ $("#copyFamilyCode")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(family.invite_code);msg("Familiencode kopiert.")}catch(e){msg("Familiencode: "+family.invite_code)}});
  const list=$("#profileList");list.innerHTML="";
  (data||[]).forEach(p=>{
    const card=document.createElement("div");card.className="profile-choice profile-choice-v154";
@@ -33,6 +37,14 @@ async function profiles(){
    card.append(start,admin);list.append(card);
  });
 }
+async function afterParentLogin(){
+ const isAdmin=Boolean(user?.app_metadata?.buhrsi_admin);
+ const {data,error}=await sb.rpc("buhrsi_family_status");
+ if(error&&!isAdmin)return msg(error.message);
+ family=data||null;
+ if(!family&&!isAdmin){app(false);show("familyView");return}
+ await profiles();
+}
 $("#openSignup").onclick=()=>{msg();show("authView")};
 document.querySelectorAll(".back-auth").forEach(b=>b.onclick=()=>{msg();show("roleView")});
 $("#unifiedLoginForm").onsubmit=async e=>{
@@ -41,7 +53,7 @@ $("#unifiedLoginForm").onsubmit=async e=>{
  if(identity.includes("@")){
    const {data,error}=await sb.auth.signInWithPassword({email:identity,password:secret});
    if(error)return msg("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");
-   user=data.user;await profiles();return;
+   user=data.user;await afterParentLogin();return;
  }
  if(!/^\d{4}$/.test(secret))return msg("Für einen Benutzernamen wird eine 4-stellige PIN benötigt.");
  let {data,error}=await sb.rpc("verify_child_pin",{p_username:identity,p_pin:secret});
@@ -59,12 +71,15 @@ $("#authForm").onsubmit=async e=>{
  if(error)return msg(error.message);
  msg("Konto erstellt. Bitte E-Mail bestätigen.");
 };
+$("#createFamilyForm").onsubmit=async e=>{e.preventDefault();msg();const button=e.submitter;button.disabled=true;const {data,error}=await sb.rpc("buhrsi_family_create",{p_name:$("#familyName").value.trim()});button.disabled=false;if(error)return msg(error.message);family=data;await profiles()};
+$("#joinFamilyForm").onsubmit=async e=>{e.preventDefault();msg();const button=e.submitter;button.disabled=true;const {data,error}=await sb.rpc("buhrsi_family_join",{p_code:$("#familyCode").value.trim().toUpperCase()});button.disabled=false;if(error)return msg(error.message);family=data;await profiles()};
+document.querySelectorAll(".family-logout").forEach(b=>b.onclick=()=>logoutToLogin041());
 $("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("create_child_account",{p_name:$("#childName").value.trim(),p_username:$("#childUsername").value.trim(),p_pin:$("#childPin").value});if(error)return msg(error.message);$("#childForm").reset();await profiles()};
 async function logoutToLogin041(){
  const token=(()=>{try{return localStorage.getItem("buhrsiChildDeviceToken")||""}catch(e){return ""}})();
  if(token&&sb){try{await sb.rpc("buhrsi_revoke_child_device_session",{p_token:token})}catch(e){}}
  try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");localStorage.removeItem("buhrsiChildDeviceToken");sessionStorage.removeItem("buhrsiChildPin");window.BuhrsiDeviceSession?.clearChild?.()}catch(e){}
- childPin="";child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView");
+ childPin="";child=null;family=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView");
 }
 $("#logoutBtn").onclick=logoutToLogin041;
 $("#backToLogin041").onclick=logoutToLogin041;
@@ -86,7 +101,7 @@ try{
  }
  else if(saved&&!savedMode&&user){try{choose(JSON.parse(saved),false)}catch(e){localStorage.removeItem("buhrsiChild")}}
  else if(saved){try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode")}catch(e){}app(false);show(savedMode?"childLoginView":"roleView")}
- else if(user)await profiles();
+ else if(user)await afterParentLogin();
  else{app(false);show("roleView")}
 }catch(e){console.error(e);msg("Cloud-Verbindung konnte nicht geladen werden.")}
 
@@ -97,7 +112,7 @@ async function openChildSelector(){
    const {data}=await sb.auth.getSession();
    user=data.session?.user||null;
  }
- if(user)await profiles();
+ if(user)await afterParentLogin();
  else show("roleView");
 }
 window.BuhrsiAuth={openChildSelector};
@@ -120,9 +135,8 @@ window.BuhrsiStreaks={
  async complete(duration=120){
    if(!sb||!child)return {ok:false,reason:"no-child"};
    if(childModeSession&&!childPin)return {ok:false,reason:"child-login-required"};
-   const fn=childModeSession?"complete_child_brushing_v024":"complete_brushing_v091";
-   const args=childModeSession?{p_child:child.id,p_pin:childPin,p_duration:duration}:{p_child:child.id,p_duration:duration};
-   const {data,error}=await sb.rpc(fn,args);
+   const args={p_child:child.id,p_pin:childModeSession?childPin:null,p_duration:duration};
+   const {data,error}=await sb.rpc("complete_child_brushing_v024",args);
    if(error){console.error(error);return {ok:false,error}}
    child=data.profile;
    try{localStorage.setItem("buhrsiChild",JSON.stringify(child));window.BuhrsiDeviceSession?.saveChild?.(child)}catch(e){}

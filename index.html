@@ -5,13 +5,16 @@
 <form id="unifiedLoginForm"><label>E-Mail oder Benutzername<input id="loginIdentity" autocomplete="username" required></label>
 <label>Passwort oder PIN<input id="loginSecret" type="password" autocomplete="current-password" required></label>
 <button class="primary" type="submit">ANMELDEN</button></form>
-<button id="openSignup" class="secondary auth-create-account" type="button">NEUES KONTO ERSTELLEN</button></div>
+<button id="openSignup" class="secondary auth-create-account" type="button">ELTERNKONTO ERSTELLEN</button></div>
 <div id="childLoginView" hidden></div>
-<div id="authView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">NEUES KONTO</p><h1>Konto erstellen</h1>
-<p class="auth-copy">Erstelle ein Konto, um eigene Profile zu verwalten.</p>
+<div id="authView" hidden><button class="back-auth" type="button">← Zurück</button><p class="eyebrow">ELTERNKONTO</p><h1>Als Elternteil registrieren</h1>
+<p class="auth-copy">Mit deinem Elternkonto erstellst du eine Familie und verwaltest die Kinder darin.</p>
 <form id="authForm"><label>E-Mail<input id="email" type="email" autocomplete="email" required></label><label>Passwort<input id="password" type="password" autocomplete="new-password" minlength="6" required></label>
-<button class="primary" data-mode="signup" type="submit">KONTO ERSTELLEN</button></form></div>
-<div id="profileView" hidden><button id="backToLogin041" class="back-to-login041" type="button">← ZURÜCK ZUR ANMELDUNG</button><p class="eyebrow" id="profileEyebrow">PROFILE</p><h1 id="profileHeading">Profile verwalten</h1><div id="profileList"></div>
+<button class="primary" data-mode="signup" type="submit">ELTERNKONTO ERSTELLEN</button></form></div>
+<div id="familyView" hidden><button class="back-auth family-logout" type="button">← Abmelden</button><p class="eyebrow">FAMILIENGRUPPE</p><h1>Deine Familie einrichten</h1><p class="auth-copy">Erstelle eine neue Familiengruppe oder tritt mit dem achtstelligen Code einer bestehenden Familie bei.</p>
+<form id="createFamilyForm"><label>Familienname<input id="familyName" maxlength="60" placeholder="z. B. Familie Buhr" required></label><button class="primary" type="submit">FAMILIE ERSTELLEN</button></form>
+<div class="family-or"><span>oder</span></div><form id="joinFamilyForm"><label>Familiencode<input id="familyCode" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="AB12CD34" required></label><button class="secondary" type="submit">FAMILIE BEITRETEN</button></form></div>
+<div id="profileView" hidden><button id="backToLogin041" class="back-to-login041" type="button">← ZURÜCK ZUR ANMELDUNG</button><p class="eyebrow" id="profileEyebrow">FAMILIE</p><h1 id="profileHeading">Kinder verwalten</h1><div id="familySummary" class="family-summary"></div><div id="profileList"></div>
 <form id="childForm"><label>Name<input id="childName" maxlength="30" required></label><label>Benutzername<input id="childUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" required></label>
 <label>4-stellige PIN<input id="childPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label><button class="primary" type="submit">PROFIL ANLEGEN</button></form></div>
 <p id="cloudMessage" class="cloud-message"></p></div></section><main class="app">
