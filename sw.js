@@ -1,4 +1,4 @@
-const CACHE = "buhrsis-v036-gold-egg-stages";
+const CACHE = "buhrsis-v037-static-egg-glow";
 const ASSETS = ["./","./index.html","./styles.css","./social.css","./reminders.css","./egg-stages.css","./app.js","./cloud.js","./social.js","./reminders.js","./egg-stages.js","./assets/eggs/egg-stage-01.webp","./assets/eggs/egg-stage-02.webp","./assets/eggs/egg-stage-03.webp","./assets/eggs/egg-stage-04.webp","./assets/eggs/egg-stage-05.webp","./assets/eggs/egg-stage-06.webp","./assets/eggs/egg-stage-07.webp","./assets/eggs/egg-stage-08.webp","./assets/eggs/egg-stage-09.webp","./assets/eggs/egg-stage-10.webp","./assets/zone.wav","./assets/finish.wav","./manifest.webmanifest","./icon-moxu-192.png","./icon-moxu-512.png"];
 
 self.addEventListener("install", event => {
