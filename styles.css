@@ -296,3 +296,16 @@ nav button{cursor:pointer;touch-action:manipulation}
 .collection-empty-state b{display:block;color:#f2ede4;font-size:18px;margin-bottom:7px}
 .collection-empty-state p{margin:0;color:#9fa8a5}
 @media(max-width:560px){.collection-empty-state{justify-content:flex-start;gap:14px}.collection-empty-state img{width:92px;height:122px}}
+
+
+/* v0.40: joyful brushing reward */
+.reward-creature{display:grid;place-items:center;min-height:210px}
+.reward-buhrsi{display:block;width:min(240px,72vw);max-height:250px;object-fit:contain;filter:drop-shadow(0 18px 22px rgba(0,0,0,.55));transform-origin:50% 85%}
+.reward.open .reward-buhrsi{animation:rewardBuhrsiCelebrate 1.15s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rewardBuhrsiCelebrate{
+  0%{opacity:0;transform:translateY(26px) scale(.78) rotate(-5deg)}
+  45%{opacity:1;transform:translateY(-8px) scale(1.07) rotate(4deg)}
+  70%{transform:translateY(2px) scale(.98) rotate(-2deg)}
+  100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}
+}
+@media(prefers-reduced-motion:reduce){.reward.open .reward-buhrsi{animation:none}}
