@@ -394,6 +394,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(!p)return;
   const d=document.getElementById("dailyStreak091"),ps=document.getElementById("perfectStreak091"),s=document.getElementById("todayStatus091");
   if(d)d.textContent=(p.streak||0)+" Tage"; if(ps)ps.textContent=(p.perfect_streak||0)+" Tage";
+  const statPerfect=document.getElementById("perfectStreakStat0431");if(statPerfect)statPerfect.textContent=p.perfect_streak||0;
   document.getElementById("brushDot1")?.classList.toggle("done",n>=1);
   document.getElementById("brushDot2")?.classList.toggle("done",n>=2);
   if(s)s.textContent=perfect?"⭐ Perfekter Tag!":n>=1?"🔥 Serie gesichert · abends noch einmal":"Noch nicht geputzt";
