@@ -354,8 +354,13 @@ window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.
    }
   }
   grid.innerHTML="";
+  if(!owned.size){
+   grid.innerHTML='<div class="collection-empty-state"><img src="assets/buhrsis/moxu.png" alt="" aria-hidden="true"><div><b>Noch kein Buhrsi entdeckt</b><p>Dein erstes Buhrsi wartet im Ei.</p></div></div>';
+   if(count)count.textContent="0 entdeckt";
+   return;
+  }
   BUHRSI_CATALOG.forEach(entry=>grid.append(createCard(entry,owned.get(entry.variant))));
-  if(count)count.textContent=`${owned.size} / ${BUHRSI_CATALOG.length} entdeckt`;
+  if(count)count.textContent=owned.size+" entdeckt";
  }
 
  document.getElementById("closeBuhrsiDetail")?.addEventListener("click",()=>detail.hidden=true);

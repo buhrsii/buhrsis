@@ -290,3 +290,9 @@ nav button{cursor:pointer;touch-action:manipulation}
 .collection .section-title>span{color:#9fa8a5;font-size:13px}
 .collection .hatch-now011{margin-top:14px}
 @media(max-width:560px){.home-collection-empty,.home-collection-discovered{justify-content:flex-start;gap:14px}.home-collection-empty img,.home-collection-discovered img{width:88px;height:115px}}
+
+.collection-empty-state{grid-column:1/-1;min-height:210px;border:1px dashed #3a4141;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:24px;padding:22px;color:#b7bfbd}
+.collection-empty-state img{width:120px;height:155px;object-fit:contain;filter:brightness(0) drop-shadow(0 0 20px rgba(154,115,255,.32));opacity:.5}
+.collection-empty-state b{display:block;color:#f2ede4;font-size:18px;margin-bottom:7px}
+.collection-empty-state p{margin:0;color:#9fa8a5}
+@media(max-width:560px){.collection-empty-state{justify-content:flex-start;gap:14px}.collection-empty-state img{width:92px;height:122px}}
