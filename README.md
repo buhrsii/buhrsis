@@ -43,4 +43,9 @@ Bereits seit v0.44:
 - Elternaufgaben für daheim mit frei wählbarer XP-Belohnung
 - private Lehrerkontaktdaten bleiben im Elternzugang
 
-Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql`, `supabase-v045-family-groups.sql`, `supabase-v046-family-customization.sql` und `supabase-v047-school-schedules.sql`.
+Bereits seit v0.49:
+
+- Elternkonten werden in der Familie mit ihrem Namen und eindeutig als Elternkonto angezeigt
+- fälschlich angelegte Kinderprofile für Mama und Papa wurden aus der Familie entfernt
+
+Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql`, `supabase-v045-family-groups.sql`, `supabase-v046-family-customization.sql`, `supabase-v047-school-schedules.sql` und `supabase-v049-parent-display-names.sql`.
