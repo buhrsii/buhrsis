@@ -226,6 +226,42 @@ window.BuhrsiLeaderboard={
  }
 };
 
+// v0.44 Kids-Organizer cloud bridge
+window.BuhrsiOrganizerAPI={
+ isParent(){return Boolean(user&&!childModeSession)},
+ child(){return child},
+ async snapshot(){
+   if(!sb||!child)return null;
+   const {data,error}=await sb.rpc("buhrsi_organizer_snapshot",{p_child:child.id,p_token:childModeSession?childPin:null});
+   if(error){console.error("organizer snapshot",error);throw error}return data;
+ },
+ async save(table,row,upsert=false){
+   const allowed=new Set(["school_profiles","school_subjects","school_teachers","school_timetable","school_events","home_tasks"]);
+   if(!this.isParent()||!allowed.has(table))throw new Error("Nur Eltern dürfen diese Angaben ändern.");
+   const payload={...row,child_id:child.id};
+   const query=upsert?sb.from(table).upsert(payload):sb.from(table).insert(payload);
+   const {data,error}=await query.select().single();if(error)throw error;return data;
+ },
+ async remove(table,id){
+   const allowed=new Set(["school_subjects","school_teachers","school_timetable","school_events","home_tasks"]);
+   if(!this.isParent()||!allowed.has(table))throw new Error("Nur Eltern dürfen Einträge löschen.");
+   const {error}=await sb.from(table).delete().eq("id",id).eq("child_id",child.id);if(error)throw error;
+ },
+ async learn(minutes,subject){
+   const {data,error}=await sb.rpc("buhrsi_log_learning",{p_child:child.id,p_minutes:minutes,p_subject:subject||null,p_token:childModeSession?childPin:null});
+   if(error)throw error;child.xp=data.xp;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
+ },
+ async completeTask(taskId){
+   const {data,error}=await sb.rpc("buhrsi_complete_home_task",{p_child:child.id,p_task:taskId,p_token:childModeSession?childPin:null});
+   if(error)throw error;child.xp=data.xp;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
+ },
+ async addGrade(values){
+   if(!this.isParent())throw new Error("Nur Eltern dürfen Noten eintragen.");
+   const {data,error}=await sb.rpc("buhrsi_add_grade",{p_child:child.id,p_subject:values.subject,p_grade:values.grade,p_category:values.category,p_weight:values.weight,p_title:values.title||null,p_graded_on:values.date});
+   if(error)throw error;child.xp=data.xp;window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
+ }
+};
+
 // v0.15.2 parent navigation
 window.parentOpenChild0152=function(profile){
   if(!profile)return;

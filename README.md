@@ -1,15 +1,18 @@
-Buhrsi's v0.15.4 – Elternnavigation direkt im Quellcode repariert
+# Buhrsi's v0.44 – Kids-Organizer
 
-Ursache:
-Die bisherigen Builds zielten auf falsche DOM-IDs/Container (`parentList`, generische Karten).
-Die echte Kinderliste heißt `profileList`. Außerdem öffnete ein Klick auf ein Kind bisher ausschließlich das Verwaltungsmodal.
+Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
 
-Jetzt direkt in `profiles()` repariert:
-- Jedes Kinderprofil zeigt sichtbar `ALS KIND STARTEN`
-- daneben `VERWALTEN`
-- `ALS KIND STARTEN` ruft direkt die vorhandene `choose()`-Funktion auf
-- `VERWALTEN` öffnet die bestehende Elternverwaltung
-- auch im Verwaltungsmodal gibt es `ALS KIND STARTEN`
-- nach neuem Kinderkonto wird die echte Liste neu geladen und diese Buttons sind sofort vorhanden
+Neu in v0.44:
 
-Keine Supabase-Änderung.
+- Startauswahl zwischen **Schule** und **Daheim**
+- Schulprofil mit Schule, Schulart, Klasse, Klassenstufe, Schuljahr und Bundesland
+- dynamische Anzeige der nächsten Schulferien nach Bundesland
+- Haupt- und Nebenfächer, Lehrer, Kontaktdaten, Sprechzeiten und Hinweise
+- Wochenstundenplan mit Fach, Lehrer, Raum und Uhrzeit
+- Schulaufgaben, Tests, Referate, Abgaben und Elterntermine
+- gewichtete Noten und getrennte Durchschnitte für Haupt-/Nebenfächer
+- Lernzeiten und gute Noten vergeben XP
+- Elternaufgaben für daheim mit frei wählbarer XP-Belohnung
+- private Lehrerkontaktdaten bleiben im Elternzugang
+
+Die Datenbankänderungen liegen in `supabase-v044-kids-organizer.sql`.
