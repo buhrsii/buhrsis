@@ -420,14 +420,14 @@ document.addEventListener("DOMContentLoaded",()=>{
 // v0.10 parent administration
 (function(){
  let selected=null;const modal=document.getElementById("parentAdmin010"),msg=document.getElementById("adminMsg010");
- window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");const edit=document.getElementById("adminProgress041");const isAdmin=Boolean(window.BuhrsiAdmin?.isAdmin?.());if(edit)edit.hidden=!isAdmin;const xp=document.getElementById("adminXp041"),streak=document.getElementById("adminStreak041");if(xp)xp.value=Number(p.xp)||0;if(streak)streak.value=Number(p.streak)||0;msg.textContent="";modal.hidden=false};
+ window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");const edit=document.getElementById("adminProgress041");const isAdmin=Boolean(window.BuhrsiAdmin?.isAdmin?.());if(edit)edit.hidden=!isAdmin;const xp=document.getElementById("adminXp041"),streak=document.getElementById("adminStreak041"),perfectStreak=document.getElementById("adminPerfectStreak0432");if(xp)xp.value=Number(p.xp)||0;if(streak)streak.value=Number(p.streak)||0;if(perfectStreak)perfectStreak.value=Number(p.perfect_streak)||0;msg.textContent="";modal.hidden=false};
  const close=()=>{modal.hidden=true;selected=null};
  document.getElementById("adminClose010")?.addEventListener("click",close);
  document.getElementById("saveProgressAdmin041")?.addEventListener("click",async event=>{
    if(!selected||!window.BuhrsiAdmin?.isAdmin?.())return;
-   const button=event.currentTarget,xp=document.getElementById("adminXp041")?.value,streak=document.getElementById("adminStreak041")?.value;
+   const button=event.currentTarget,xp=document.getElementById("adminXp041")?.value,streak=document.getElementById("adminStreak041")?.value,perfectStreak=document.getElementById("adminPerfectStreak0432")?.value;
    button.disabled=true;msg.textContent="Werte werden gespeichert …";
-   const r=await window.BuhrsiAdmin.setProgress(selected.id,xp,streak);
+   const r=await window.BuhrsiAdmin.setProgress(selected.id,xp,streak,perfectStreak);
    button.disabled=false;
    if(!r.ok){msg.textContent="Speichern fehlgeschlagen: "+(r.error?.message||"Keine Berechtigung");return}
    selected={...selected,...r.data};

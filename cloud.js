@@ -133,11 +133,12 @@ window.BuhrsiStreaks={
 
 window.BuhrsiAdmin={
  isAdmin(){return Boolean(user?.app_metadata?.buhrsi_admin)},
- async setProgress(id,xp,streak){
+ async setProgress(id,xp,streak,perfectStreak){
    if(!this.isAdmin())return {ok:false,reason:"admin-required"};
    const cleanXp=Math.max(0,Math.min(1000000,Math.trunc(Number(xp)||0)));
    const cleanStreak=Math.max(0,Math.min(9999,Math.trunc(Number(streak)||0)));
-   const {data,error}=await sb.from("child_profiles").update({xp:cleanXp,streak:cleanStreak}).eq("id",id).select("id,parent_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").single();
+   const cleanPerfectStreak=Math.max(0,Math.min(9999,Math.trunc(Number(perfectStreak)||0)));
+   const {data,error}=await sb.from("child_profiles").update({xp:cleanXp,streak:cleanStreak,perfect_streak:cleanPerfectStreak}).eq("id",id).select("id,parent_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").single();
    if(!error&&child&&String(child.id)===String(id)){child={...child,...data};try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}}
    return {ok:!error,error,data};
  },
