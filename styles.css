@@ -318,3 +318,8 @@ nav button{cursor:pointer;touch-action:manipulation}
 .admin-progress041 label{display:grid;gap:6px;color:#aeb6b3;font-size:12px;font-weight:800}
 .admin-progress041 input{width:100%;box-sizing:border-box;min-height:46px;border:1px solid #3b4342;border-radius:12px;background:#101415;color:#fff;padding:10px;font-size:17px}
 .admin-progress041 button{grid-column:1/-1;min-height:48px;border:0;border-radius:12px;background:#f6bd55;color:#17191a;font-weight:900}
+
+
+/* v0.42.2 safe return from profile administration */
+.back-to-login041{width:100%;min-height:44px;margin:0 0 20px;border:1px solid #3b4342;border-radius:13px;background:#1b2122;color:#eee8de;font-weight:900;letter-spacing:.03em;cursor:pointer}
+.back-to-login041:hover{border-color:#f6bd55;color:#f6bd55}

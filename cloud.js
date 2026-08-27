@@ -60,11 +60,14 @@ $("#authForm").onsubmit=async e=>{
  msg("Konto erstellt. Bitte E-Mail bestätigen.");
 };
 $("#childForm").onsubmit=async e=>{e.preventDefault();msg();let {data,error}=await sb.rpc("create_child_account",{p_name:$("#childName").value.trim(),p_username:$("#childUsername").value.trim(),p_pin:$("#childPin").value});if(error)return msg(error.message);$("#childForm").reset();await profiles()};
-$("#logoutBtn").onclick=async()=>{
+async function logoutToLogin041(){
  const token=(()=>{try{return localStorage.getItem("buhrsiChildDeviceToken")||""}catch(e){return ""}})();
  if(token&&sb){try{await sb.rpc("buhrsi_revoke_child_device_session",{p_token:token})}catch(e){}}
  try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");localStorage.removeItem("buhrsiChildDeviceToken");sessionStorage.removeItem("buhrsiChildPin");window.BuhrsiDeviceSession?.clearChild?.()}catch(e){}
- childPin="";child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView")};
+ childPin="";child=null;if(user)await sb.auth.signOut();user=null;childModeSession=false;app(false);show("roleView");
+}
+$("#logoutBtn").onclick=logoutToLogin041;
+$("#backToLogin041").onclick=logoutToLogin041;
 try{
  let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
  sb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
