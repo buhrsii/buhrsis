@@ -1,11 +1,18 @@
 const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co"; const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
-let sb,user,child,family,childModeSession=false,childPin="",parentTab="overview";
+let sb,user,child,family,childModeSession=false,childPin="",parentTab="overview",adminAccess=false;
 try{childPin=localStorage.getItem("buhrsiChildDeviceToken")||sessionStorage.getItem("buhrsiChildPin")||""}catch(e){}
 const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"";
 function show(id){if(!id||id==="childLoginView")id="roleView";["roleView","childLoginView","authView","familyView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
 function app(on){$("#authGate").hidden=on;$(".app").hidden=!on}
 const safe=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const FAMILY_EMOJIS=["👨‍👩‍👧‍👦","🏡","❤️","🌟","🐻","🦊","🐼","🦁","🌈","🚀"];
+async function refreshAdminAccess(){
+ adminAccess=false;
+ if(!sb||!user)return false;
+ const {data,error}=await sb.rpc("buhrsi_is_admin");
+ adminAccess=!error&&data===true;
+ return adminAccess;
+}
 function initials(name){const first=String(name||"").trim().match(/\p{L}/u)?.[0]||"K",familyWords=String(family?.name||"Buhrs").match(/\p{L}+/gu)||["Buhrs"],last=familyWords.at(-1)?.[0]||"B";return `${first}${last}`.toUpperCase()}
 function choose(p,isChild=false){
  child=p;childModeSession=isChild;const profileInitials=initials(p.name);$("#profileName").textContent=p.name;document.querySelector(".top .avatar").textContent=profileInitials;$("#areaProfileName").textContent=p.name;$("#areaAvatar").textContent=profileInitials;
@@ -21,7 +28,7 @@ async function profiles(){
  let {data,error}=await sb.from("child_profiles").select("id,parent_id,family_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").order("created_at");
  if(error)return msg(error.message);
  show("profileView");
- const isAdmin=Boolean(user?.app_metadata?.buhrsi_admin);
+ const isAdmin=adminAccess;
  const heading=$("#profileHeading"),eyebrow=$("#profileEyebrow");
  if(heading)heading.textContent=isAdmin?"Alle Profile verwalten":parentTab==="manage"?"Familie verwalten":`${family?.emoji||FAMILY_EMOJIS[0]} ${family?.name||"Familie"}`;
  if(eyebrow)eyebrow.textContent=isAdmin?"ADMINISTRATION":"FAMILIE";
@@ -38,12 +45,12 @@ async function profiles(){
 }
 function openChildArea(p,tab){choose(p,false);if(tab)setTimeout(()=>window.BuhrsiOrganizer?.open?.(tab),60)}
 function renderOverviewChild(list,p){const card=document.createElement("article");card.className="parent-child-card";card.dataset.childCard=p.id;card.innerHTML=`<div class="parent-child-head"><div class="parent-child-avatar">${safe(initials(p.name))}</div><div><h2>${safe(p.name)}</h2><small>@${safe(p.username||"noch-ohne-login")}</small></div><span>${Number(p.xp)||0} XP</span></div><div class="parent-child-school" data-school-summary><p>Schulinfos werden geladen …</p></div><div class="parent-child-actions"><button type="button" data-open-profile>PROFIL ÖFFNEN</button><button type="button" class="primary-parent-action" data-open-school>SCHULINFOS</button></div>`;card.querySelector("[data-open-profile]").onclick=()=>openChildArea(p);card.querySelector("[data-open-school]").onclick=()=>openChildArea(p,"overview");list.append(card)}
-function renderManageChild(list,p){const card=document.createElement("div");card.className="profile-choice profile-choice-v154";card.innerHTML=`<div class="profile-info-v154"><b>${safe(p.name)}</b><small>@${safe(p.username||"noch-ohne-login")} · ${safe(p.buhrsi_code||"")}</small></div>`;const school=document.createElement("button");school.type="button";school.className="child-school-v050";school.textContent="SCHULE & NOTEN BEARBEITEN";school.onclick=()=>openChildArea(p,"manage");const start=document.createElement("button");start.type="button";start.className="child-start-v154";start.textContent="PROFIL ÖFFNEN";start.onclick=()=>openChildArea(p);const admin=document.createElement("button");admin.type="button";admin.className="child-admin-v154";admin.textContent=Boolean(user?.app_metadata?.buhrsi_admin)?"XP & STREAKS BEARBEITEN":"KINDERKONTO";admin.onclick=()=>window.openParentAdmin010?.(p);card.append(school,start,admin);list.append(card)}
+function renderManageChild(list,p){const card=document.createElement("div");card.className="profile-choice profile-choice-v154";card.innerHTML=`<div class="profile-info-v154"><b>${safe(p.name)}</b><small>@${safe(p.username||"noch-ohne-login")} · ${safe(p.buhrsi_code||"")}</small></div>`;const school=document.createElement("button");school.type="button";school.className="child-school-v050";school.textContent="SCHULE & NOTEN BEARBEITEN";school.onclick=()=>openChildArea(p,"manage");const start=document.createElement("button");start.type="button";start.className="child-start-v154";start.textContent="PROFIL ÖFFNEN";start.onclick=()=>openChildArea(p);const admin=document.createElement("button");admin.type="button";admin.className="child-admin-v154";admin.textContent=adminAccess?"XP, STREAKS & PUTZVERLAUF":"KINDERKONTO";admin.onclick=()=>window.openParentAdmin010?.(p);card.append(school,start,admin);list.append(card)}
 async function loadParentChildSummaries(rows){await Promise.all(rows.map(async p=>{const host=document.querySelector(`[data-child-card="${p.id}"] [data-school-summary]`);if(!host)return;const {data,error}=await sb.rpc("buhrsi_organizer_snapshot",{p_child:p.id,p_token:null});if(error||!data){host.innerHTML='<p>Noch keine Schulinfos verfügbar.</p>';return}const profile=data.profile||{},grades=data.grades||[],weight=grades.reduce((n,g)=>n+Number(g.weight||0),0),average=weight?(grades.reduce((n,g)=>n+Number(g.grade)*Number(g.weight||0),0)/weight).toFixed(2):"—",next=(data.events||[]).filter(e=>!e.completed&&new Date(e.due_at)>=new Date()).sort((a,b)=>new Date(a.due_at)-new Date(b.due_at))[0],phone=profile.school_phone?`<span>☎ ${safe(profile.school_phone)}</span>`:"";host.innerHTML=`<div><small>SCHULE</small><b>${safe(profile.school_name||"Noch nicht eingetragen")}</b><span>${safe(profile.class_name||"Klasse offen")}</span>${phone}</div><div><small>NOTENSCHNITT</small><b>${average}</b><span>${grades.length} Note${grades.length===1?"":"n"}</span></div><div><small>NÄCHSTER TERMIN</small><b>${safe(next?.title||"Kein Termin")}</b><span>${next?new Date(next.due_at).toLocaleDateString("de-DE"):"Alles aktuell"}</span></div>`}))}
-function setParentTab(tab,reloadHeading=true){parentTab=tab==="manage"?"manage":"overview";$("#parentOverview").hidden=parentTab!=="overview";$("#parentManage").hidden=parentTab!=="manage";document.querySelectorAll("[data-parent-tab]").forEach(b=>b.classList.toggle("active",b.dataset.parentTab===parentTab));if(reloadHeading){const isAdmin=Boolean(user?.app_metadata?.buhrsi_admin);$("#profileHeading").textContent=isAdmin?"Alle Profile verwalten":parentTab==="manage"?"Familie verwalten":`${family?.emoji||FAMILY_EMOJIS[0]} ${family?.name||"Familie"}`}}
+function setParentTab(tab,reloadHeading=true){parentTab=tab==="manage"?"manage":"overview";$("#parentOverview").hidden=parentTab!=="overview";$("#parentManage").hidden=parentTab!=="manage";document.querySelectorAll("[data-parent-tab]").forEach(b=>b.classList.toggle("active",b.dataset.parentTab===parentTab));if(reloadHeading){$("#profileHeading").textContent=adminAccess?"Alle Profile verwalten":parentTab==="manage"?"Familie verwalten":`${family?.emoji||FAMILY_EMOJIS[0]} ${family?.name||"Familie"}`}}
 document.querySelector(".parent-tabs")?.addEventListener("click",e=>{const tab=e.target.closest("[data-parent-tab]")?.dataset.parentTab;if(tab)setParentTab(tab)});
 async function afterParentLogin(){
- const isAdmin=Boolean(user?.app_metadata?.buhrsi_admin);
+ const isAdmin=adminAccess;
  const {data,error}=await sb.rpc("buhrsi_family_status");
  if(error&&!isAdmin)return msg(error.message);
  family=data||null;
@@ -60,7 +67,7 @@ $("#unifiedLoginForm").onsubmit=async e=>{
    child=null;childPin="";childModeSession=false;
    const {data,error}=await sb.auth.signInWithPassword({email:identity,password:secret});
    if(error)return msg("Anmeldung fehlgeschlagen. Bitte Eingaben prüfen.");
-   user=data.user;await afterParentLogin();return;
+   user=data.user;await refreshAdminAccess();await afterParentLogin();return;
  }
  if(!/^\d{4}$/.test(secret))return msg("Für einen Benutzernamen wird eine 4-stellige PIN benötigt.");
  let {data,error}=await sb.rpc("verify_child_pin",{p_username:identity,p_pin:secret});
@@ -86,7 +93,7 @@ async function logoutToLogin041(){
  const token=(()=>{try{return localStorage.getItem("buhrsiChildDeviceToken")||""}catch(e){return ""}})();
  const hadUser=Boolean(user);
  try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");localStorage.removeItem("buhrsiChildDeviceToken");sessionStorage.removeItem("buhrsiChildPin");window.BuhrsiDeviceSession?.clearChild?.()}catch(e){}
- childPin="";child=null;family=null;user=null;childModeSession=false;document.body.classList.remove("school-mode","locked");app(false);show("roleView");msg();
+ childPin="";child=null;family=null;user=null;adminAccess=false;childModeSession=false;document.body.classList.remove("school-mode","locked");app(false);show("roleView");msg();
  if(token&&sb){try{await sb.rpc("buhrsi_revoke_child_device_session",{p_token:token})}catch(e){}}
  if(hadUser&&sb){try{await sb.auth.signOut({scope:"local"})}catch(e){}}
 }
@@ -97,6 +104,7 @@ try{
  sb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  const {data:sessionData}=await sb.auth.getSession();
  user=sessionData.session?.user||null;
+ await refreshAdminAccess();
  let saved=null,savedMode=false;
  try{saved=localStorage.getItem("buhrsiChild");savedMode=localStorage.getItem("buhrsiChildMode")==="1"}catch(e){}
  if(saved&&savedMode&&childPin){
@@ -121,6 +129,7 @@ async function openChildSelector(){
  if(!user&&sb){
    const {data}=await sb.auth.getSession();
    user=data.session?.user||null;
+   await refreshAdminAccess();
  }
  if(user)await afterParentLogin();
  else show("roleView");
@@ -163,7 +172,7 @@ window.BuhrsiStreaks={
 };
 
 window.BuhrsiAdmin={
- isAdmin(){return Boolean(user?.app_metadata?.buhrsi_admin)},
+ isAdmin(){return adminAccess},
  async setProgress(id,xp,streak,perfectStreak){
    if(!this.isAdmin())return {ok:false,reason:"admin-required"};
    const cleanXp=Math.max(0,Math.min(1000000,Math.trunc(Number(xp)||0)));
@@ -172,6 +181,11 @@ window.BuhrsiAdmin={
    const {data,error}=await sb.from("child_profiles").update({xp:cleanXp,streak:cleanStreak,perfect_streak:cleanPerfectStreak}).eq("id",id).select("id,parent_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").single();
    if(!error&&child&&String(child.id)===String(id)){child={...child,...data};try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}}
    return {ok:!error,error,data};
+ },
+ async brushHistory(id){
+   if(!adminAccess)return {ok:false,reason:"admin-required",data:[]};
+   const {data,error}=await sb.from("brushing_sessions").select("completed_at,duration_seconds,xp_earned").eq("child_id",id).order("completed_at",{ascending:false}).limit(100);
+   return {ok:!error,error,data:data||[]};
  },
  async resetProgress(id){
    const {error}=await sb.rpc("reset_child_progress",{p_child:id});

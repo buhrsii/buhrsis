@@ -497,7 +497,19 @@ document.addEventListener("DOMContentLoaded",()=>{
 // v0.10 parent administration
 (function(){
  let selected=null;const modal=document.getElementById("parentAdmin010"),msg=document.getElementById("adminMsg010");
- window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");const edit=document.getElementById("adminProgress041");const isAdmin=Boolean(window.BuhrsiAdmin?.isAdmin?.());if(edit)edit.hidden=!isAdmin;const xp=document.getElementById("adminXp041"),streak=document.getElementById("adminStreak041"),perfectStreak=document.getElementById("adminPerfectStreak0432");if(xp)xp.value=Number(p.xp)||0;if(streak)streak.value=Number(p.streak)||0;if(perfectStreak)perfectStreak.value=Number(p.perfect_streak)||0;msg.textContent="";modal.hidden=false};
+ async function loadBrushHistory(p){
+   const section=document.getElementById("adminBrushHistory058"),list=document.getElementById("adminBrushHistoryList058");
+   if(!section||!list)return;
+   const isAdmin=Boolean(window.BuhrsiAdmin?.isAdmin?.());section.hidden=!isAdmin;if(!isAdmin)return;
+   list.innerHTML="<p>Putzverlauf wird geladen …</p>";
+   const result=await window.BuhrsiAdmin.brushHistory(p.id);
+   if(!result.ok){list.innerHTML="<p>Putzverlauf konnte nicht geladen werden.</p>";return}
+   const groups=new Map();
+   result.data.forEach(row=>{const date=new Date(row.completed_at),key=date.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"});if(!groups.has(key))groups.set(key,[]);groups.get(key).push({time:date.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}),duration:Number(row.duration_seconds)||0})});
+   if(!groups.size){list.innerHTML="<p>Noch keine Putzrunde gespeichert.</p>";return}
+   list.innerHTML=`<p class="admin-brush-total058">${result.data.length} gespeicherte Putzrunde${result.data.length===1?"":"n"}</p>`+[...groups.entries()].map(([date,rounds])=>`<div class="admin-brush-day058"><div><b>${date}</b><span>${rounds.length}× geputzt</span></div><small>${rounds.map(r=>`${r.time} Uhr · ${Math.round(r.duration/60)} Min.`).join("<br>")}</small></div>`).join("");
+ }
+ window.openParentAdmin010=p=>{selected=p;document.getElementById("adminName010").textContent=p.name;document.getElementById("adminMeta010").textContent="@"+(p.username||"—")+" · "+(p.buhrsi_code||"");const edit=document.getElementById("adminProgress041");const isAdmin=Boolean(window.BuhrsiAdmin?.isAdmin?.());if(edit)edit.hidden=!isAdmin;const xp=document.getElementById("adminXp041"),streak=document.getElementById("adminStreak041"),perfectStreak=document.getElementById("adminPerfectStreak0432");if(xp)xp.value=Number(p.xp)||0;if(streak)streak.value=Number(p.streak)||0;if(perfectStreak)perfectStreak.value=Number(p.perfect_streak)||0;msg.textContent="";modal.hidden=false;loadBrushHistory(p)};
  const close=()=>{modal.hidden=true;selected=null};
  document.getElementById("adminClose010")?.addEventListener("click",close);
  document.getElementById("saveProgressAdmin041")?.addEventListener("click",async event=>{
