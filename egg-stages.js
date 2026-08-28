@@ -4,9 +4,8 @@ const EGG_STAGE_ASSETS={
   3:"./assets/eggs/egg-stage-03.webp",
   4:"./assets/eggs/egg-stage-04.webp",
   5:"./assets/eggs/egg-stage-05.webp",
-  6:"./assets/eggs/egg-stage-06.webp",
-  7:"./assets/eggs/egg-stage-07.webp",
-  8:"./assets/eggs/egg-stage-08.webp",
+  // Stufen 6–8 haben noch die alten Entwürfe. Bis die neuen Motive
+  // freigegeben sind, bleibt das zuletzt freigegebene Ei sichtbar.
   9:"./assets/eggs/egg-stage-09.webp",
   10:"./assets/eggs/egg-stage-10.webp"
 };
@@ -45,7 +44,7 @@ function renderEggArtwork(){
   if(progress){
     progress.dataset.energyStage=String(stage);
     const fill=progress.querySelector(".egg-v05-fill");if(fill)fill.style.width=(energy/2)+"%";
-    const label=progress.querySelector(".egg-v05-label");if(label)label.textContent=energy>=200?"Bereit zum Erwecken":energy+" / 200 XP · Stufe "+stage+" / 10";
+    const label=progress.querySelector(".egg-v05-label");if(label)label.textContent=energy>=200?"Bereit zum Erwecken":energy+" / 200 Ei-Energie · Stufe "+stage+" / 10";
   }
 }
 
