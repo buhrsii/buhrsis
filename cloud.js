@@ -126,7 +126,7 @@ async function openChildSelector(){
  else show("roleView");
 }
 window.BuhrsiAuth={openChildSelector,logout:logoutToLogin041};
-window.BuhrsiCloud={get child(){return child},async saveProgress(p){if(!sb||!child||childModeSession)return {ok:false};let {data,error}=await sb.from("child_profiles").update({xp:+p.xp||0,gloss:Math.max(0,Math.min(100,+p.gloss||0)),streak:+p.streak||0,egg_energy:+p.eggEnergy||0}).eq("id",child.id).select().single();if(!error)child=data;return {ok:!error,data,error}},async logBrush(){}};
+window.BuhrsiCloud={get child(){return child},async saveProgress(){if(!sb||!child||childModeSession)return {ok:false};const {data,error}=await sb.from("child_profiles").select("*").eq("id",child.id).single();if(!error){child=data;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}))}return {ok:!error,data,error}},async logBrush(){}};
 
 window.BuhrsiCollection={
  async list(){
