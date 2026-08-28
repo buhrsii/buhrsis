@@ -16,7 +16,7 @@ function render(){
  $('#xpBar').style.width=(into/2)+'%';$('#xpToNext').textContent=into;
  const egg=Math.min(state.eggEnergy||0,200);$('#eggXp').textContent=egg;$('#eggBar').style.width=(egg/2)+'%';
  $('#streak').textContent=state.streak;$('#glanzHome').textContent=state.glanz;
- $('#week').innerHTML='';for(let i=0;i<7;i++){let d=document.createElement('i');d.className='day'+(i<Math.min(state.streak,7)?' done':'');d.textContent=i<Math.min(state.streak,7)?'✓':'';$('#week').append(d)}
+ if(!$('#week').children.length){['MO','DI','MI','DO','FR','SA','SO'].forEach(label=>{const item=document.createElement('span');item.className='week-day';item.innerHTML='<small>'+label+'</small><i class="day"></i>';$('#week').append(item)})}
 }
 window.resetBuhrsiLocalProgress=()=>{
  Object.assign(state,defaults);
@@ -136,6 +136,52 @@ function applyCloudProfile026(profile){
 }
 window.applyCloudProfile026=applyCloudProfile026;
 window.addEventListener("buhrsi:child-change",event=>applyCloudProfile026(event.detail||window.BuhrsiStreaks?.profile?.()));
+window.addEventListener("buhrsi:progress-saved",event=>applyCloudProfile026(event.detail||window.BuhrsiStreaks?.profile?.()));
+
+// v0.57: authoritative weekly history and monthly brushing calendar
+(function(){
+ const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+ let shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1),requestId=0;
+ const dateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+ function monthArg(){return dateKey(shownMonth)}
+ function renderWeek(counts){
+   const today=new Date(),monday=new Date(today);monday.setHours(12,0,0,0);monday.setDate(today.getDate()-((today.getDay()+6)%7));
+   document.querySelectorAll('#week .week-day').forEach((item,index)=>{
+     const date=new Date(monday);date.setDate(monday.getDate()+index);
+     const count=counts.get(dateKey(date))||0,dot=item.querySelector('.day');
+     dot.className='day'+(count>=2?' twice':count===1?' done':'');
+     dot.textContent=count>=2?'2×':count===1?'✓':'';
+     item.classList.toggle('today',dateKey(date)===dateKey(today));
+     item.setAttribute('aria-label',`${item.querySelector('small').textContent}: ${count} Putzrunde${count===1?'':'n'}`);
+   });
+ }
+ function renderCalendar(rows){
+   const counts=new Map((rows||[]).map(r=>[String(r.brush_date),Number(r.brush_count)||0]));
+   const title=document.getElementById('calendarMonth'),grid=document.getElementById('calendarGrid');if(!title||!grid)return;
+   title.textContent=`${monthNames[shownMonth.getMonth()]} ${shownMonth.getFullYear()}`;grid.innerHTML='';
+   const firstOffset=(shownMonth.getDay()+6)%7,days=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,0).getDate(),today=dateKey(new Date());
+   for(let i=0;i<firstOffset;i++){const blank=document.createElement('span');blank.className='calendar-day blank';grid.append(blank)}
+   for(let day=1;day<=days;day++){
+     const date=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),day),key=dateKey(date),count=counts.get(key)||0,cell=document.createElement('span');
+     cell.className='calendar-day'+(count>=2?' twice':count===1?' once':'')+(key===today?' today':'');
+     cell.innerHTML=`<b>${day}</b>${count?`<small>${Math.min(count,2)}×</small>`:''}`;
+     cell.setAttribute('aria-label',`${day}. ${monthNames[shownMonth.getMonth()]}: ${count} Putzrunde${count===1?'':'n'}`);grid.append(cell);
+   }
+   const now=new Date();document.getElementById('calendarNext').disabled=shownMonth.getFullYear()===now.getFullYear()&&shownMonth.getMonth()===now.getMonth();
+   if(shownMonth.getFullYear()===now.getFullYear()&&shownMonth.getMonth()===now.getMonth())renderWeek(counts);
+ }
+ async function load(){
+   const current=++requestId;renderCalendar([]);
+   const rows=await window.BuhrsiStreaks?.calendar?.(monthArg())||[];
+   if(current===requestId)renderCalendar(rows);
+ }
+ document.getElementById('calendarPrev')?.addEventListener('click',()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()-1,1);load()});
+ document.getElementById('calendarNext')?.addEventListener('click',()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,1);load()});
+ window.addEventListener('buhrsi:child-change',()=>{shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);setTimeout(load,80)});
+ window.addEventListener('buhrsi:progress-saved',()=>setTimeout(load,50));
+ window.addEventListener('buhrsi:progress-reset',()=>setTimeout(load,50));
+ setTimeout(load,1300);
+})();
 
 // v0.5 cloud/egg adapter
 (function(){

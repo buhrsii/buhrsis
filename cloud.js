@@ -152,6 +152,13 @@ window.BuhrsiStreaks={
    try{localStorage.setItem("buhrsiChild",JSON.stringify(child));window.BuhrsiDeviceSession?.saveChild?.(child)}catch(e){}
    return {ok:true,...data}
  },
+ async calendar(month){
+   if(!sb||!child)return [];
+   if(childModeSession&&!childPin)return [];
+   const {data,error}=await sb.rpc("buhrsi_brush_calendar",{p_child:child.id,p_token:childModeSession?childPin:null,p_month:month});
+   if(error){console.error("brush calendar",error);return []}
+   return data||[];
+ },
  profile(){return child}
 };
 

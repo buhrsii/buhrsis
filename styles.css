@@ -334,3 +334,37 @@ nav button{cursor:pointer;touch-action:manipulation}
 /* v0.43.2 third protected admin progress value */
 .admin-progress041{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:430px){.admin-progress041{grid-template-columns:1fr}.admin-progress041 button{grid-column:1}}
+
+/* v0.57 XP sync, named weekdays and brushing calendar */
+.week{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px!important}
+.week-day{display:grid;justify-items:center;gap:6px;min-width:0}
+.week-day small{font-size:9px;color:#8f9996;font-weight:900;letter-spacing:.04em}
+.week-day.today small{color:var(--gold)}
+.week-day .day{font-style:normal;font-size:10px;font-weight:900}
+.week-day .day.twice{background:#fff1a8;border-color:#fff1a8;color:#111;box-shadow:0 0 16px #ffc55b55}
+.brush-calendar{margin-top:16px;padding:22px}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.calendar-head .eyebrow{font-size:11px}
+.calendar-head h2{margin:4px 0 12px;font-size:22px}
+.calendar-nav{display:flex;gap:8px}
+.calendar-nav button{width:42px;height:42px;border-radius:50%;border:1px solid #394040;background:#1b2122;color:#f6f3eb;font-size:28px;line-height:1}
+.calendar-nav button:disabled{opacity:.3}
+.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.calendar-weekdays{margin:6px 0}
+.calendar-weekdays span{text-align:center;color:#89928f;font-size:9px;font-weight:900}
+.calendar-day{aspect-ratio:1;border-radius:12px;border:1px solid #2d3434;background:#171c1d;display:grid;place-content:center;text-align:center;min-width:0}
+.calendar-day b{font-size:13px}
+.calendar-day small{font-size:9px;margin-top:1px;font-weight:900}
+.calendar-day.once{background:#5b4520;border-color:#d89f3d;color:#ffe0a1}
+.calendar-day.twice{background:var(--gold);border-color:var(--gold);color:#15120c;box-shadow:0 0 14px #ffc55b33}
+.calendar-day.today{outline:2px solid #f6f3eb;outline-offset:1px}
+.calendar-day.blank{visibility:hidden}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;color:#aab0ae;font-size:11px}
+.calendar-legend span{display:flex;align-items:center;gap:6px}
+.calendar-legend i{width:12px;height:12px;border-radius:4px;background:#5b4520;border:1px solid #d89f3d}
+.calendar-legend i.twice{background:var(--gold);border-color:var(--gold)}
+@media(max-width:420px){
+ .brush-calendar{padding:18px 14px}
+ .calendar-weekdays,.calendar-grid{gap:4px}
+ .calendar-day{border-radius:10px}
+}
