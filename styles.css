@@ -382,3 +382,13 @@ nav button{cursor:pointer;touch-action:manipulation}
 .app-profile-values small{margin-top:4px;color:#9da6a3;font-size:9px;font-weight:900}
 .app-profile-home{width:100%;margin-top:18px}
 #homeSection,#statsSection,#collectionV08,#profileSection{scroll-margin-top:18px}
+
+/* v0.59 direct return from brushing to School/Home choice */
+.home-choice-return,.brush-choice-return{border:1px solid #4b4f49;background:#171c1d;color:#f4efe5;border-radius:13px;padding:10px 13px;font-weight:900;letter-spacing:.02em;cursor:pointer;touch-action:manipulation}
+.home-choice-return{margin:0 0 18px}
+.brush-choice-return{color:var(--gold);white-space:nowrap}
+@media(max-width:520px){
+ .brush-top{align-items:center;gap:8px;font-size:11px}
+ .brush-choice-return{padding:9px 10px;font-size:10px}
+ .brush-top>b{white-space:nowrap}
+}

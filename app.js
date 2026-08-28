@@ -130,8 +130,31 @@ function closeReward(){
  finishing=false;
  toast('✨ Fortschritt gespeichert');
 }
+function returnToAreaChooser(){
+ if(timer)clearInterval(timer);
+ timer=null;brushEndAt=0;left=BRUSH_DURATION;lastZone=-1;finishing=false;
+ try{sessionStorage.removeItem("buhrsiBrushEndAt")}catch(e){}
+ $('#brushScreen')?.classList.remove('open','finale');
+ $('#reward')?.classList.remove('open');
+ document.body.classList.remove('locked');
+ document.documentElement.classList.remove('tips-open');
+ if(window.BuhrsiOrganizer?.openChooser)window.BuhrsiOrganizer.openChooser();
+ else{
+  const chooser=document.getElementById('areaChooser'),organizer=document.getElementById('organizerScreen');
+  if(chooser)chooser.hidden=false;if(organizer)organizer.hidden=true;document.body.classList.remove('school-mode');
+ }
+ window.scrollTo(0,0);
+}
 function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2200)}
 $('#start').onclick=openBrush;$('#rewardDone').onclick=closeReward;
+const homeChoiceButton=document.createElement('button');
+homeChoiceButton.id='homeBackToChooser';homeChoiceButton.type='button';homeChoiceButton.className='home-choice-return';homeChoiceButton.textContent='← ZUR AUSWAHL';
+document.querySelector('#homeSection .hero-copy')?.prepend(homeChoiceButton);
+const brushChoiceButton=document.createElement('button');
+brushChoiceButton.id='brushBackToChooser';brushChoiceButton.type='button';brushChoiceButton.className='brush-choice-return';brushChoiceButton.textContent='← ZUR AUSWAHL';
+document.querySelector('#brushScreen .brush-top')?.prepend(brushChoiceButton);
+homeChoiceButton.addEventListener('click',returnToAreaChooser);
+brushChoiceButton.addEventListener('click',returnToAreaChooser);
 render();
 
 function applyCloudProfile026(profile){
