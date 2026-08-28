@@ -17,6 +17,14 @@ function render(){
  const egg=Math.min(state.eggEnergy||0,200);$('#eggXp').textContent=egg;$('#eggBar').style.width=(egg/2)+'%';
  $('#streak').textContent=state.streak;$('#glanzHome').textContent=state.glanz;
  if(!$('#week').children.length){['MO','DI','MI','DO','FR','SA','SO'].forEach(label=>{const item=document.createElement('span');item.className='week-day';item.innerHTML='<small>'+label+'</small><i class="day"></i>';$('#week').append(item)})}
+ const profile=window.BuhrsiStreaks?.profile?.();
+ const profileName=profile?.name||document.getElementById('profileName')?.textContent||'Buhrsi’s';
+ const initials=String(profileName).trim().split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'B';
+ const profileAvatar=document.getElementById('appProfileAvatar'),profileTitle=document.getElementById('appProfileName');
+ if(profileAvatar)profileAvatar.textContent=initials;if(profileTitle)profileTitle.textContent=profileName;
+ if(document.getElementById('appProfileXp'))document.getElementById('appProfileXp').textContent=state.xp;
+ if(document.getElementById('appProfileStreak'))document.getElementById('appProfileStreak').textContent=state.streak;
+ if(document.getElementById('appProfilePerfect'))document.getElementById('appProfilePerfect').textContent=Number(profile?.perfect_streak)||0;
 }
 window.resetBuhrsiLocalProgress=()=>{
  Object.assign(state,defaults);
@@ -833,19 +841,24 @@ window.addEventListener("load",()=>{
  setTimeout(attach,500);setTimeout(attach,1500);
 })();
 
-// v0.17 functional bottom navigation
+// v0.58 functional bottom navigation
 (function(){
- const nav=document.querySelector("nav");
+ const nav=document.getElementById("mainNav");
  if(!nav)return;
- nav.addEventListener("click",async event=>{
-  const button=event.target.closest("button");
+ function openTarget(button){
   if(!button||!nav.contains(button))return;
-  nav.querySelectorAll("button").forEach(item=>item.classList.toggle("active",item===button));
-  if(button.dataset.navAction==="profile"){
-   await window.BuhrsiAuth?.openChildSelector?.();
-   return;
-  }
+  nav.querySelectorAll("button").forEach(item=>{
+   const active=item===button;item.classList.toggle("active",active);
+   if(active)item.setAttribute("aria-current","page");else item.removeAttribute("aria-current");
+  });
   const target=document.getElementById(button.dataset.navTarget||"");
   target?.scrollIntoView({behavior:"auto",block:"start"});
+ }
+ nav.addEventListener("click",event=>{
+  const button=event.target.closest("button");
+  if(!button||!nav.contains(button))return;
+  event.preventDefault();openTarget(button);
  });
+ document.getElementById("profileBackHome")?.addEventListener("click",()=>openTarget(nav.querySelector('[data-nav-target="homeSection"]')));
+ window.BuhrsiMainNav={home(){openTarget(nav.querySelector('[data-nav-target="homeSection"]'))}};
 })();

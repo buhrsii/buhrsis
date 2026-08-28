@@ -368,3 +368,17 @@ nav button{cursor:pointer;touch-action:manipulation}
  .calendar-weekdays,.calendar-grid{gap:4px}
  .calendar-day{border-radius:10px}
 }
+
+/* v0.58 reliable main navigation and in-app profile */
+#mainNav{pointer-events:auto!important;touch-action:manipulation}
+#mainNav button{pointer-events:auto!important;touch-action:manipulation;cursor:pointer}
+.app-profile-card{margin-top:16px;padding:28px;text-align:center;scroll-margin-top:18px}
+.app-profile-avatar{width:72px;height:72px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:#d8c6a5;color:#171717;font-size:24px;font-weight:900;border:2px solid #f6bd55}
+.app-profile-card h2{margin:5px 0 20px;font-size:26px}
+.app-profile-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.app-profile-values div{padding:14px 6px;border-radius:14px;background:#1b2122}
+.app-profile-values b,.app-profile-values small{display:block}
+.app-profile-values b{color:var(--gold);font-size:22px}
+.app-profile-values small{margin-top:4px;color:#9da6a3;font-size:9px;font-weight:900}
+.app-profile-home{width:100%;margin-top:18px}
+#homeSection,#statsSection,#collectionV08,#profileSection{scroll-margin-top:18px}
