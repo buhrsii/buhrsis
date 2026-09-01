@@ -1,5 +1,5 @@
 const SUPABASE_URL="https://qxjxopqvhnkoexpvnsrr.supabase.co"; const SUPABASE_KEY="sb_publishable_37_1NuI52Z7QP5STRQh8iw_RocldPyv";
-let sb,user,child,family,childModeSession=false,childPin="",parentTab="overview",adminAccess=false;
+let sb,user,child,family,childModeSession=false,childPin="",parentTab="overview",adminAccess=false,profileRefreshPromise=null;
 try{childPin=localStorage.getItem("buhrsiChildDeviceToken")||sessionStorage.getItem("buhrsiChildPin")||""}catch(e){}
 const $=s=>document.querySelector(s), msg=t=>$("#cloudMessage").textContent=t||"";
 function show(id){if(!id||id==="childLoginView")id="roleView";["roleView","childLoginView","authView","familyView","profileView"].forEach(x=>$("#"+x).hidden=x!==id);}
@@ -23,6 +23,35 @@ function choose(p,isChild=false){
  }catch(e){}
  app(true);
  window.dispatchEvent(new CustomEvent("buhrsi:child-change",{detail:p}));
+}
+async function fetchFreshProfile(p,isChild=childModeSession){
+ if(!sb||!p?.id)return null;
+ if(isChild){
+   if(childPin.length>4){
+     const {data,error}=await sb.rpc("buhrsi_restore_child_device_session",{p_token:childPin});
+     return !error&&data?.length?data[0]:null;
+   }
+   if(/^\d{4}$/.test(childPin)&&p.username){
+     const {data,error}=await sb.rpc("verify_child_pin",{p_username:p.username,p_pin:childPin});
+     return !error&&data?.length?data[0]:null;
+   }
+   return null;
+ }
+ if(!user)return null;
+ const {data,error}=await sb.from("child_profiles")
+   .select("id,parent_id,family_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date")
+   .eq("id",p.id).maybeSingle();
+ return error?null:data;
+}
+async function refreshCurrentProfile(){
+ if(profileRefreshPromise||!child)return profileRefreshPromise;
+ const activeId=String(child.id),isChild=childModeSession;
+ profileRefreshPromise=(async()=>{
+   const latest=await fetchFreshProfile(child,isChild);
+   if(latest&&String(child?.id)===activeId)choose(latest,isChild);
+   return latest;
+ })().finally(()=>{profileRefreshPromise=null});
+ return profileRefreshPromise;
 }
 async function profiles(){
  let {data,error}=await sb.from("child_profiles").select("id,parent_id,family_id,name,username,buhrsi_code,xp,gloss,streak,perfect_streak,egg_energy,last_brush_date,last_perfect_date").order("created_at");
@@ -114,10 +143,13 @@ try{
      else if(error){try{choose(JSON.parse(saved),true);msg("Verbindung wird wiederhergestellt. Das Profil bleibt angemeldet.")}catch(e){app(false);show("roleView")}}
      else{try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode");localStorage.removeItem("buhrsiChildDeviceToken");sessionStorage.removeItem("buhrsiChildPin")}catch(e){}childPin="";app(false);show("roleView");msg("Die Kinder-Sitzung ist abgelaufen. Bitte erneut anmelden.")}
    }else{
-     try{choose(JSON.parse(saved),true)}catch(e){localStorage.removeItem("buhrsiChild");app(false);show("roleView")}
+     try{
+       const cached=JSON.parse(saved),latest=await fetchFreshProfile(cached,true);
+       choose(latest||cached,true);
+     }catch(e){localStorage.removeItem("buhrsiChild");app(false);show("roleView")}
    }
  }
- else if(saved&&!savedMode&&user){try{choose(JSON.parse(saved),false)}catch(e){localStorage.removeItem("buhrsiChild")}}
+ else if(saved&&!savedMode&&user){try{const cached=JSON.parse(saved),latest=await fetchFreshProfile(cached,false);choose(latest||cached,false)}catch(e){localStorage.removeItem("buhrsiChild")}}
  else if(saved){try{localStorage.removeItem("buhrsiChild");localStorage.removeItem("buhrsiChildMode")}catch(e){}app(false);show("roleView")}
  else if(user)await afterParentLogin();
  else{app(false);show("roleView")}
@@ -135,7 +167,9 @@ async function openChildSelector(){
  else show("roleView");
 }
 window.BuhrsiAuth={openChildSelector,logout:logoutToLogin041};
-window.BuhrsiCloud={get child(){return child},async saveProgress(){if(!sb||!child||childModeSession)return {ok:false};const {data,error}=await sb.from("child_profiles").select("*").eq("id",child.id).single();if(!error){child=data;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}))}return {ok:!error,data,error}},async logBrush(){}};
+window.BuhrsiCloud={get child(){return child},refreshProfile:refreshCurrentProfile,async saveProgress(){if(!sb||!child||childModeSession)return {ok:false};const {data,error}=await sb.from("child_profiles").select("*").eq("id",child.id).single();if(!error){child=data;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}))}return {ok:!error,data,error}},async logBrush(){}};
+window.addEventListener("focus",()=>refreshCurrentProfile());
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refreshCurrentProfile()});
 
 window.BuhrsiCollection={
  async list(){
