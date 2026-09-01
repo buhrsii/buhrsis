@@ -333,8 +333,8 @@ nav button{cursor:pointer;touch-action:manipulation}
 .perfect-stat0431 strong{color:#f6bd55}
 
 
-/* v0.43.2 third protected admin progress value */
-.admin-progress041{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* v0.63 protected admin progress values including egg energy */
+.admin-progress041{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:430px){.admin-progress041{grid-template-columns:1fr}.admin-progress041 button{grid-column:1}}
 
 /* v0.57 XP sync, named weekdays and brushing calendar */

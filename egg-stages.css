@@ -1,5 +1,5 @@
 .egg-art,.egg-v05-art{position:relative;isolation:isolate;overflow:visible!important;background:radial-gradient(ellipse at 50% 52%,rgba(128,88,255,.2) 0%,rgba(88,63,190,.1) 38%,transparent 70%)!important}
-.egg-stage-image{position:relative;z-index:1;display:block;object-fit:contain;filter:drop-shadow(0 10px 24px rgba(87,62,214,.3));transform:translateY(7px);transform-origin:50% 58%;animation:none!important}
+.egg-stage-image{position:relative;z-index:1;display:block;object-fit:contain;background:transparent!important;mix-blend-mode:screen;filter:drop-shadow(0 10px 24px rgba(87,62,214,.3));transform:translateY(7px);transform-origin:50% 58%;animation:none!important}
 .egg-stage-image-home{width:min(100%,180px);height:180px}
 .egg-v05-art{width:150px!important;height:180px!important;border-radius:22px!important;box-shadow:none!important;display:grid;place-items:center}
 .egg-stage-image-progress{width:150px;height:180px}
