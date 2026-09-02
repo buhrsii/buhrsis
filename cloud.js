@@ -171,17 +171,32 @@ window.BuhrsiCloud={get child(){return child},refreshProfile:refreshCurrentProfi
 window.addEventListener("focus",()=>refreshCurrentProfile());
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refreshCurrentProfile()});
 
+async function activeCollection(){
+ if(!sb||!child)return [];
+ const request=childModeSession
+   ?sb.rpc("buhrsi_child_collection",{p_child:child.id,p_token:childPin})
+   :sb.from("buhrsis").select("*").eq("child_id",child.id).order("born_at",{ascending:false});
+ const {data,error}=await request;
+ if(error){console.error(error);return []}
+ return data||[];
+}
+async function hatchActiveEgg(){
+ if(!sb||!child)return {ok:false,reason:"no-child"};
+ if(childModeSession&&!childPin)return {ok:false,reason:"child-login-required"};
+ const request=childModeSession
+   ?sb.rpc("buhrsi_child_hatch_ready_egg",{p_child:child.id,p_token:childPin})
+   :sb.rpc("hatch_ready_egg",{p_child:child.id});
+ const {data,error}=await request;
+ if(error){console.error(error);return {ok:false,error}}
+ child={...child,egg_energy:0};
+ try{localStorage.setItem("buhrsiChild",JSON.stringify(child));window.BuhrsiDeviceSession?.saveChild?.(child)}catch(e){}
+ window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));
+ return {ok:true,data};
+}
+
 window.BuhrsiCollection={
- async list(){
-   if(!sb||!child||childModeSession) return [];
-   const {data,error}=await sb.from("buhrsis").select("*").eq("child_id",child.id).order("born_at",{ascending:false});
-   if(error){console.error(error);return []} return data||[];
- },
- async hatch(){
-   if(!sb||!child||childModeSession) return null;
-   const {data,error}=await sb.rpc("hatch_buhrsi",{p_child:child.id});
-   if(error){console.error(error);return null} child.egg_energy=0; return data;
- }
+ async list(){return activeCollection()},
+ async hatch(){const result=await hatchActiveEgg();return result.ok?result.data:null}
 };
 
 window.BuhrsiStreaks={
@@ -236,17 +251,8 @@ window.BuhrsiAdmin={
 };
 
 window.BuhrsiHatch={
- async hatch(){
-   if(!sb||!child||childModeSession)return {ok:false,reason:"child-session"};
-   const {data,error}=await sb.rpc("hatch_ready_egg",{p_child:child.id});
-   if(error){console.error(error);return {ok:false,error}}
-   child.egg_energy=0;return {ok:true,data};
- },
- async collection(){
-   if(!sb||!child||childModeSession)return [];
-   const {data,error}=await sb.from("buhrsis").select("*").eq("child_id",child.id).order("born_at",{ascending:false});
-   return error?[]:(data||[]);
- },
+ async hatch(){return hatchActiveEgg()},
+ async collection(){return activeCollection()},
  profile(){return child}
 };
 
