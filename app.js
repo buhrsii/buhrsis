@@ -332,7 +332,7 @@ window.addEventListener("buhrsi:progress-saved",event=>applyCloudProfile026(even
  const detailVisual=document.getElementById("detailVisual");
  const detailImage=document.getElementById("detailImage");
  const byVariant=new Map(BUHRSI_CATALOG.map(entry=>[entry.variant,entry]));
- const availableAssets=new Set(["moxu","sonnenschein","flaemmchen","bluupy","rosalie","brillberto","zauberlin","herzilein","zitro","pinkadora","wellenbob","detekto","koenigchen","lavaknirp","schlumpfi","glitzerglueck","aurorix"]);
+ const availableAssets=new Set(["moxu","sonnenschein","flaemmchen","bluupy","rosalie","brillberto","zauberlin","herzilein","zitro","pinkadora","wellenbob","detekto","koenigchen","lavaknirp","schlumpfi","glitzerglueck","smaragdus","aurorix"]);
  const normalize=value=>String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
  const bySpecies=new Map(BUHRSI_CATALOG.flatMap(entry=>[entry.species,entry.legacySpecies].filter(Boolean).map(species=>[normalize(species),entry])));
  const rarityLabel=rarity=>({COMMON:"GEWÖHNLICH",RARE:"SELTEN",EPIC:"EPISCH",LEGENDARY:"LEGENDÄR",NEUTRAL:"BEGLEITER"})[rarity]||rarity;
