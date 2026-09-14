@@ -19,3 +19,12 @@ body.school-mode>.app>section:not(#organizerScreen):not(#areaChooser),body.schoo
 .timetable-subject-select:focus{outline:2px solid #ffc55b;outline-offset:1px}
 .timetable-subject-select:disabled{opacity:.65;cursor:wait}
 @media(max-width:700px){.timetable-edit-cell{min-width:112px}.timetable-subject-select{min-width:98px;font-size:11px}}
+
+/* v0.69: Lern-Stoppuhr und Lernprotokoll */
+.learning-stopwatch{display:grid;gap:12px}
+.learning-clock{padding:18px;border:1px solid #3b4643;border-radius:16px;background:#101615;color:#ffc55b;text-align:center;font-size:clamp(34px,9vw,54px);font-weight:950;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.learning-xp-preview{margin:0;color:#b7c0bd;text-align:center;font-size:12px;font-weight:800}
+.learning-controls{display:grid;grid-template-columns:1fr auto;gap:8px}
+.learning-controls #learningStart,.learning-controls #learningStop{grid-column:1/-1}
+.learning-history .organizer-item em{color:#8ee0ae;font-style:normal;font-weight:900;white-space:nowrap}
+@media(max-width:520px){.learning-controls{grid-template-columns:1fr}.learning-clock{padding:14px;font-size:38px}}
