@@ -132,6 +132,7 @@ $("#backToLogin041").onclick=logoutToLogin041;
 try{
  let m=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
  sb=m.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ window.BuhrsiDBClient=sb;
  const {data:sessionData}=await sb.auth.getSession();
  user=sessionData.session?.user||null;
  await refreshAdminAccess();

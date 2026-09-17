@@ -876,18 +876,41 @@ window.addEventListener("load",()=>{
  setTimeout(attach,500);setTimeout(attach,1500);
 })();
 
-// v0.58 functional bottom navigation
+// v0.72 real bottom navigation: every item opens its own app view
 (function(){
  const nav=document.getElementById("mainNav");
  if(!nav)return;
+ const pages={
+  homeSection:["homeSection","leaderboard0149","brushCalendar","streakV091"],
+  collectionV08:["collectionV08"],
+  rewardsSection:["rewardsSection"],
+  statsSection:["statsSection"],
+  profileSection:["profileSection"]
+ };
+ const egg=document.querySelector("main.app > section.egg");
+ const pageElements=[...new Set(Object.values(pages).flat().map(id=>document.getElementById(id)).filter(Boolean))];
+ if(egg){pages.homeSection.push("__homeEgg");pageElements.push(egg)}
  function openTarget(button){
   if(!button||!nav.contains(button))return;
+  const pageId=button.dataset.navTarget||"homeSection";
+  const visibleIds=new Set(pages[pageId]||pages.homeSection);
   nav.querySelectorAll("button").forEach(item=>{
    const active=item===button;item.classList.toggle("active",active);
    if(active)item.setAttribute("aria-current","page");else item.removeAttribute("aria-current");
   });
-  const target=document.getElementById(button.dataset.navTarget||"");
-  target?.scrollIntoView({behavior:"auto",block:"start"});
+  pageElements.forEach(section=>{section.hidden=section===egg?!visibleIds.has("__homeEgg"):!visibleIds.has(section.id)});
+  document.body.dataset.mainPage=pageId;
+  const target=document.getElementById(pageId);
+  requestAnimationFrame(()=>{
+   const blockingOverlay=document.querySelector("#brushScreen.open,#reward.open,#hatchV06:not([hidden])");
+   if(!blockingOverlay){
+    document.body.classList.remove("locked");
+    document.body.style.overflow="";
+    document.documentElement.style.overflow="";
+   }
+   if(pageId==="homeSection")window.scrollTo({top:0,behavior:"auto"});
+   else target?.scrollIntoView({behavior:"auto",block:"start"});
+  });
  }
  nav.addEventListener("click",event=>{
   const button=event.target.closest("button");
@@ -895,5 +918,9 @@ window.addEventListener("load",()=>{
   event.preventDefault();openTarget(button);
  });
  document.getElementById("profileBackHome")?.addEventListener("click",()=>openTarget(nav.querySelector('[data-nav-target="homeSection"]')));
- window.BuhrsiMainNav={home(){openTarget(nav.querySelector('[data-nav-target="homeSection"]'))}};
+ window.BuhrsiMainNav={
+  home(){openTarget(nav.querySelector('[data-nav-target="homeSection"]'))},
+  open(pageId){openTarget(nav.querySelector(`[data-nav-target="${pageId}"]`))}
+ };
+ openTarget(nav.querySelector("button.active")||nav.querySelector("button"));
 })();

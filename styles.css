@@ -374,6 +374,9 @@ nav button{cursor:pointer;touch-action:manipulation}
 /* v0.58 reliable main navigation and in-app profile */
 #mainNav{pointer-events:auto!important;touch-action:manipulation}
 #mainNav button{pointer-events:auto!important;touch-action:manipulation;cursor:pointer}
+#homeSection[hidden],#leaderboard0149[hidden],#brushCalendar[hidden],#streakV091[hidden],
+#statsSection[hidden],#collectionV08[hidden],#profileSection[hidden],#rewardsSection[hidden],
+main.app>section.egg[hidden]{display:none!important}
 .app-profile-card{margin-top:16px;padding:28px;text-align:center;scroll-margin-top:18px}
 .app-profile-avatar{width:72px;height:72px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:#d8c6a5;color:#171717;font-size:24px;font-weight:900;border:2px solid #f6bd55}
 .app-profile-card h2{margin:5px 0 20px;font-size:26px}
