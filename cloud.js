@@ -319,8 +319,11 @@ window.BuhrsiOrganizerAPI={
  child(){return child},
  async snapshot(){
    if(!sb||!child)return null;
-   const {data,error}=await sb.rpc("buhrsi_organizer_snapshot",{p_child:child.id,p_token:childModeSession?childPin:null});
-   if(error){console.error("organizer snapshot",error);throw error}return data;
+   const auth={p_child:child.id,p_token:childModeSession?childPin:null};
+   const [organizer,timers]=await Promise.all([sb.rpc("buhrsi_organizer_snapshot",auth),sb.rpc("buhrsi_activity_timers_snapshot",auth)]);
+   if(organizer.error){console.error("organizer snapshot",organizer.error);throw organizer.error}
+   if(timers.error){console.error("timer snapshot",timers.error);throw timers.error}
+   return {...organizer.data,activity_timers:timers.data||{active:[],history:[]}};
  },
  async save(table,row,upsert=false){
    const allowed=new Set(["school_profiles","school_subjects","school_teachers","school_timetable","school_schedule_entries","school_events","home_tasks"]);
@@ -339,6 +342,23 @@ window.BuhrsiOrganizerAPI={
    const {data,error}=await sb.rpc("buhrsi_log_learning",{p_child:child.id,p_minutes:minutes,p_subject:subject||null,p_token:childModeSession?childPin:null});
    if(error)throw error;child.xp=data.xp;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
  },
+ async startTimer(timerType,subject,title){
+   const {data,error}=await sb.rpc("buhrsi_start_activity_timer",{p_child:child.id,p_timer_type:timerType,p_subject:subject||null,p_title:title||null,p_token:childModeSession?childPin:null});
+   if(error)throw error;return data;
+ },
+ async finishTimer(timerId){
+   const {data,error}=await sb.rpc("buhrsi_finish_activity_timer",{p_child:child.id,p_timer:timerId,p_token:childModeSession?childPin:null});
+   if(error)throw error;child.xp=data.xp;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
+ },
+ async cancelTimer(timerId){
+   const {error}=await sb.rpc("buhrsi_cancel_activity_timer",{p_child:child.id,p_timer:timerId,p_token:childModeSession?childPin:null});
+   if(error)throw error;
+ },
+ async editTimer(timerId,startedAt,endedAt){
+   if(!this.isParent())throw new Error("Nur Eltern dürfen Zeiten korrigieren.");
+   const {data,error}=await sb.rpc("buhrsi_edit_activity_timer",{p_child:child.id,p_timer:timerId,p_started_at:startedAt,p_ended_at:endedAt});
+   if(error)throw error;child.xp=data.xp;window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
+ },
  async completeTask(taskId){
    const {data,error}=await sb.rpc("buhrsi_complete_home_task",{p_child:child.id,p_task:taskId,p_token:childModeSession?childPin:null});
    if(error)throw error;child.xp=data.xp;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
@@ -347,6 +367,25 @@ window.BuhrsiOrganizerAPI={
    if(!this.isParent())throw new Error("Nur Eltern dürfen Noten eintragen.");
    const {data,error}=await sb.rpc("buhrsi_add_grade",{p_child:child.id,p_subject:values.subject,p_grade:values.grade,p_category:values.category,p_weight:values.weight,p_title:values.title||null,p_graded_on:values.date});
    if(error)throw error;child.xp=data.xp;window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
+ }
+};
+
+window.BuhrsiRewardsAPI={
+ isParent(){return Boolean(user&&!childModeSession)},
+ child(){return child},
+ async snapshot(){
+   if(!sb||!child)return null;
+   const {data,error}=await sb.rpc("buhrsi_rewards_snapshot",{p_child:child.id,p_token:childModeSession?childPin:null});
+   if(error)throw error;return data;
+ },
+ async request(rewardType){
+   const {data,error}=await sb.rpc("buhrsi_request_reward",{p_child:child.id,p_reward_type:rewardType,p_token:childModeSession?childPin:null});
+   if(error)throw error;return data;
+ },
+ async resolve(requestId,approved){
+   if(!this.isParent())throw new Error("Nur Eltern dürfen Belohnungen freigeben.");
+   const {data,error}=await sb.rpc("buhrsi_resolve_reward",{p_request:requestId,p_approved:Boolean(approved)});
+   if(error)throw error;child.xp=data.xp;try{localStorage.setItem("buhrsiChild",JSON.stringify(child))}catch(e){}window.dispatchEvent(new CustomEvent("buhrsi:progress-saved",{detail:child}));return data;
  }
 };
 

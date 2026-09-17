@@ -28,3 +28,12 @@ body.school-mode>.app>section:not(#organizerScreen):not(#areaChooser),body.schoo
 .learning-controls #learningStart,.learning-controls #learningStop{grid-column:1/-1}
 .learning-history .organizer-item em{color:#8ee0ae;font-style:normal;font-weight:900;white-space:nowrap}
 @media(max-width:520px){.learning-controls{grid-template-columns:1fr}.learning-clock{padding:14px;font-size:38px}}
+.homework-panel{background:radial-gradient(circle at 100% 0,#27214a,#111718 48%)}
+.homework-clock{color:#b9a7ff;border-color:#493f6c}
+.learning-stopwatch>label{display:grid;gap:5px;color:#aeb7b4;font-size:12px;font-weight:800}
+.learning-stopwatch select,.learning-stopwatch input{width:100%;border:1px solid #394140;background:#0d1213;color:#f4f1e9;border-radius:11px;padding:11px;font:inherit}
+.timer-history-item{border:1px solid #303938;border-radius:15px;background:#192020;overflow:hidden}
+.timer-history-item summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;cursor:pointer;list-style:none}
+.timer-history-item summary::-webkit-details-marker{display:none}.timer-history-item summary b,.timer-history-item summary small{display:block}.timer-history-item summary small{margin-top:4px;color:#9eaaa6}.timer-history-item summary em{color:#8ee0ae;font-style:normal;font-weight:900;white-space:nowrap}
+.timer-edit-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 13px 13px;border-top:1px solid #303938}.timer-edit-form label{display:grid;gap:5px;padding-top:12px;color:#aeb7b4;font-size:11px;font-weight:800}.timer-edit-form input{min-width:0;border:1px solid #394140;background:#0d1213;color:#f4f1e9;border-radius:9px;padding:9px;font:inherit}.timer-edit-form button{grid-column:1/-1;border:0;border-radius:10px;background:#ffc55b;color:#18120a;padding:10px;font-weight:950}.timer-edit-form p{grid-column:1/-1;margin:0;color:#e9a0a0;font-size:11px}
+@media(max-width:520px){.timer-edit-form{grid-template-columns:1fr}.timer-edit-form button,.timer-edit-form p{grid-column:auto}}

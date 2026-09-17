@@ -1,6 +1,14 @@
-# Buhrsi's v0.51 – Elternübersicht
+# Buhrsi's v0.71 – Belohnungen & Aktivitäts-Timer
 
 Die PWA verbindet den bisherigen Zahnputz- und Buhrsi-Bereich mit einem geschützten Organizer für Kinder und Eltern.
+
+Neu in v0.71:
+
+- 2.500 XP können nach Elternfreigabe gegen V-Bucks, Robux oder einen Brawl Pass eingelöst werden
+- grafische Gutschein-Karten mit Fortschritt bis zum nächsten Ziel
+- getrennte Timer für Lernen und Hausaufgaben, jeweils mit Fächerauswahl
+- Eltern erhalten beim Timerstart ein In-App-Pop-up und können Start- und Endzeiten korrigieren
+- Lernen bringt bis zu 90 XP pro Stunde; Noten 1/2 bringen 400/200 XP
 
 Neu in v0.51:
 
